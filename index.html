@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FAMU-SBC · Pão de Queijo</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧀</text></svg>">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var useState = React.useState;
+var useEffect = React.useEffect;
+var useRef = React.useRef;
+var API_URL = "https://script.google.com/macros/s/AKfycbynmeXB-e1rmD7fuYI-MOZ7HZWEpiSKgAmn9jKnBliI7NMTPVkokq4BabPXHykmVcyh/exec";
+var API_TOKEN = "FAMU2026";
+function apiGet(action, params) {
+  var url = API_URL + "?action=" + action + "&token=" + API_TOKEN;
+  Object.keys(params || {}).forEach(function(k) {
+    url += "&" + encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
+  });
+  return fetch(url).then(function(r) {
+    return r.json();
+  });
+}
+function apiPost(body) {
+  var url = API_URL + "?token=" + API_TOKEN;
+  Object.keys(body).forEach(function(k) {
+    if (k !== "token") {
+      var val = body[k];
+      if (Array.isArray(val))
+        val = val.join(",");
+      url += "&" + encodeURIComponent(k) + "=" + encodeURIComponent(val);
+    }
+  });
+  return fetch(url).then(function(r) {
+    return r.json();
+  });
+}
+var C = {
+  or: "#E8611A",
+  orD: "#C74F10",
+  orL: "#F47B3A",
+  orS: "rgba(232,97,26,0.08)",
+  orB: "rgba(232,97,26,0.18)",
+  orG: "rgba(232,97,26,0.25)",
+  nv: "#1B2A4A",
+  wh: "#FFFFFF",
+  ow: "#F7F5F2",
+  g50: "#FAFAF8",
+  g100: "#F0EEEB",
+  g200: "#E2DFDA",
+  g300: "#C8C4BD",
+  g500: "#76716A",
+  g700: "#3D3935",
+  tx: "#1E1B18",
+  mu: "#76716A",
+  di: "#B0ACA5",
+  ok: "#1A7D46",
+  okB: "rgba(26,125,70,0.08)",
+  okD: "rgba(26,125,70,0.2)",
+  wn: "#B8860B",
+  wnB: "rgba(184,134,11,0.08)",
+  wnD: "rgba(184,134,11,0.2)",
+  wa: "#25D366",
+  waB: "rgba(37,211,102,0.1)",
+  waD: "rgba(37,211,102,0.25)"
+};
+var FD = "'Barlow Condensed','Arial Narrow',sans-serif";
+var FB = "'Barlow','Helvetica Neue',sans-serif";
+var FM = "'IBM Plex Mono','SF Mono',monospace";
+var WA_LINK = "https://wa.me/551123633775";
+var DEMO_STU = [
+  { ra: "2024001", nome: "Ana Carolina Silva", turma: "ADM-3A" },
+  { ra: "2024002", nome: "Bruno Ferreira Costa", turma: "DIR-2B" },
+  { ra: "2024003", nome: "Camila Rodrigues", turma: "ENG-1A" },
+  { ra: "2024004", nome: "Daniel Oliveira", turma: "PED-4C" },
+  { ra: "2024005", nome: "Eduarda Santos", turma: "PSI-2A" },
+  { ra: "2024006", nome: "Felipe Almeida", turma: "ADM-1B" },
+  { ra: "2024007", nome: "Gabriela Lima", turma: "DIR-3A" },
+  { ra: "2024008", nome: "Henrique Souza", turma: "ENG-2B" },
+  { ra: "2024009", nome: "Isabela Martins", turma: "PED-1A" },
+  { ra: "2024010", nome: "Jo\xE3o Pedro Nascimento", turma: "PSI-3B" },
+  { ra: "2024011", nome: "Karla Mendes", turma: "ADM-2A" },
+  { ra: "2024012", nome: "Lucas Barbosa", turma: "DIR-1C" },
+  { ra: "2024013", nome: "Mariana Ribeiro", turma: "ENG-3A" },
+  { ra: "2024014", nome: "Nicolas Pereira", turma: "PED-2B" },
+  { ra: "2024015", nome: "Olivia Carvalho", turma: "PSI-1A" }
+];
+var DEMO_AVISOS = [
+  { titulo: "Reuni\xE3o de alunos", texto: "Dia 28/05 \xE0s 18h30 na sala 12.", dataFim: "" },
+  { titulo: "Documenta\xE7\xE3o pendente", texto: "Regularize at\xE9 30/05 na secretaria.", dataFim: "" },
+  { titulo: "Hor\xE1rio especial", texto: "Semana 02/06 a 06/06: funcionamento 17h30 \xE0s 22h.", dataFim: "" }
+];
+function getToday() {
+  return (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+}
+function getNow() {
+  return (/* @__PURE__ */ new Date()).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+function makePin(ra, d) {
+  var s = ra + "-" + d + "-famusbc";
+  var h = 0;
+  for (var i = 0; i < s.length; i++)
+    h = (h << 5) - h + s.charCodeAt(i) | 0;
+  return String(Math.abs(h) % 9e3 + 1e3);
+}
+var DOW_FULL = ["Domingo", "Segunda", "Ter\xE7a", "Quarta", "Quinta", "Sexta", "S\xE1bado"];
+var DOW_SHORT = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "S\xE1b"];
+function getDow() {
+  return (/* @__PURE__ */ new Date()).getDay();
+}
+function isApiConfigured() {
+  return API_URL.indexOf("COLE_SUA_URL") === -1;
+}
+var GCSS = [
+  "@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');",
+  "*{margin:0;padding:0;box-sizing:border-box}",
+  "::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:" + C.g100 + "}::-webkit-scrollbar-thumb{background:" + C.g300 + ";border-radius:3px}",
+  "@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}",
+  "@keyframes fadeIn{from{opacity:0}to{opacity:1}}",
+  "@keyframes scaleIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}",
+  "@keyframes slideLeft{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}",
+  "@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}"
+].join("\n");
+function Badge(p) {
+  var m = { success: { b: C.okB, c: C.ok, d: C.okD }, warning: { b: C.wnB, c: C.wn, d: C.wnD }, error: { b: C.orS, c: C.or, d: C.orB }, neutral: { b: C.g100, c: C.g500, d: C.g200 } };
+  var s = m[p.type] || m.neutral;
+  return /* @__PURE__ */ React.createElement("span", { style: { display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600, fontFamily: FB, background: s.b, color: s.c, border: "1px solid " + s.d, textTransform: "uppercase", letterSpacing: "0.04em" } }, /* @__PURE__ */ React.createElement("span", { style: { width: 5, height: 5, borderRadius: "50%", background: s.c } }), p.children);
+}
+function MetricBox(p) {
+  var a = p.accent;
+  return /* @__PURE__ */ React.createElement("div", { style: { background: a ? C.or : C.wh, borderRadius: 12, padding: "18px 22px", border: a ? "none" : "1px solid " + C.g200, flex: 1, minWidth: 130, boxShadow: a ? "0 4px 20px " + C.orG : "0 1px 3px rgba(0,0,0,0.04)" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: a ? "rgba(255,255,255,0.7)" : C.mu, fontFamily: FB, fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" } }, p.label), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 32, fontWeight: 800, color: a ? C.wh : C.tx, fontFamily: FD, lineHeight: 1 } }, p.value), p.sub && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: a ? "rgba(255,255,255,0.6)" : C.mu, fontFamily: FB, marginTop: 6 } }, p.sub));
+}
+function Stripe() {
+  return /* @__PURE__ */ React.createElement("div", { style: { height: 4, background: "linear-gradient(90deg," + C.or + "," + C.orL + "," + C.or + ")", width: "100%" } });
+}
+function TopBar(p) {
+  return /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 24px", borderBottom: "1px solid " + C.g200, display: "flex", alignItems: "center", justifyContent: "space-between", background: C.wh } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: p.onBack, style: { background: "none", border: "none", color: C.mu, fontSize: 13, cursor: "pointer", fontFamily: FB, fontWeight: 500 } }, "\u2190 Voltar"), /* @__PURE__ */ React.createElement("div", { style: { width: 1, height: 16, background: C.g200 } }), /* @__PURE__ */ React.createElement("div", { style: { height: 28, borderRadius: 6, background: C.or, padding: "0 8px", display: "flex", alignItems: "center", fontSize: 10, color: C.wh, fontWeight: 800, fontFamily: FD, letterSpacing: "0.04em" } }, "FAMU-SBC"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, color: C.tx } }, p.title), p.badge && /* @__PURE__ */ React.createElement(Badge, { type: p.bt || "neutral" }, p.badge)), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM } }, getToday()));
+}
+function LogoMark(p) {
+  var sz = p.size || 88;
+  return /* @__PURE__ */ React.createElement("div", { style: { width: sz, height: sz, borderRadius: sz * 0.22, background: C.or, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", margin: "0 auto " + (p.mb || 24) + "px", boxShadow: "0 6px 28px " + C.orG, lineHeight: 1.1 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: sz * 0.25, color: C.wh, fontWeight: 900, fontFamily: FD } }, "FAMU"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: sz * 0.18, color: "rgba(255,255,255,0.8)", fontWeight: 700, fontFamily: FD } }, "SBC"));
+}
+function PageTitle(p) {
+  var sz = p.size || 48;
+  return /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("h1", { style: { fontSize: sz, fontWeight: 900, fontFamily: FD, color: C.nv, letterSpacing: "0.02em", textTransform: "uppercase", marginBottom: 4, lineHeight: 1.1 } }, "P\xE3o de Queijo"), /* @__PURE__ */ React.createElement("div", { style: { width: 48, height: 4, borderRadius: 2, background: C.or, margin: "4px auto 8px" } }), /* @__PURE__ */ React.createElement("p", { style: { color: C.or, fontSize: Math.max(12, sz * 0.28), fontWeight: 700, fontFamily: FD, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: p.mb || 32 } }, "cidade pra frente"));
+}
+function Spinner() {
+  return /* @__PURE__ */ React.createElement("div", { style: { display: "inline-block", width: 20, height: 20, border: "3px solid " + C.g200, borderTopColor: C.or, borderRadius: "50%", animation: "spin 0.6s linear infinite" } });
+}
+function WhatsAppBtn() {
+  return /* @__PURE__ */ React.createElement("a", { href: WA_LINK, target: "_blank", rel: "noopener noreferrer", style: { display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", borderRadius: 12, background: C.waB, border: "1px solid " + C.waD, textDecoration: "none", cursor: "pointer" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 22 } }, "\u{1F4AC}"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "left" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#1a8d47", fontFamily: FD, textTransform: "uppercase" } }, "Enviar Mensagem"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu } }, "(11) 2363-3775")), /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 14, color: C.mu } }, "\u2192"));
+}
+function MuralAvisos(p) {
+  var avisos = p.avisos || DEMO_AVISOS;
+  return /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: 20, border: "1px solid " + C.g200, marginTop: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 13, fontFamily: FD, textTransform: "uppercase", marginBottom: 14, color: C.nv, display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { color: C.or } }, "\u25CF"), " Mural de Avisos"), avisos.map(function(a, i) {
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: { padding: "12px 14px", borderRadius: 10, background: C.g50, marginBottom: 8, borderLeft: "3px solid " + C.or } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: C.nv, marginBottom: 4 } }, a.titulo || a.title), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, lineHeight: 1.5 } }, a.texto || a.text));
+  }));
+}
+function StudentView(p) {
+  var isPickupDay = p.pickupActive;
+  var pickupTime = p.pickupTime;
+  var avisos = p.avisos;
+  var onBack = p.onBack;
+  var terms = p.terms;
+  var setTerms = p.setTerms;
+  var raS = useState("");
+  var ra = raS[0];
+  var setRa = raS[1];
+  var resS = useState(null);
+  var resultado = resS[0];
+  var setResultado = resS[1];
+  var errS = useState("");
+  var erro = errS[0];
+  var setErro = errS[1];
+  var loadS = useState(false);
+  var loading = loadS[0];
+  var setLoading = loadS[1];
+  var tmS = useState(false);
+  var showTerms = tmS[0];
+  var setShowTerms = tmS[1];
+  var prS = useState("");
+  var pendingRa = prS[0];
+  var setPendingRa = prS[1];
+  function handleAccess() {
+    var r = ra.trim();
+    if (!r)
+      return;
+    setErro("");
+    if (!terms[r]) {
+      setPendingRa(r);
+      setShowTerms(true);
+      return;
+    }
+    doCheckin(r);
+  }
+  function doCheckin(r) {
+    setLoading(true);
+    if (isApiConfigured()) {
+      apiPost({ action: "checkin", ra: r }).then(function(resp) {
+        setLoading(false);
+        if (!resp.sucesso) {
+          setErro(resp.erro);
+          setResultado(null);
+          return;
+        }
+        setResultado({
+          type: resp.jaRegistrado ? "already" : "success",
+          nome: resp.nome,
+          turma: resp.turma,
+          time: resp.horaCheckin,
+          pin: resp.pin,
+          horario: resp.horario
+        });
+      }).catch(function() {
+        setLoading(false);
+        setErro("Erro de conex\xE3o. Tente novamente.");
+      });
+    } else {
+      var stu = DEMO_STU.find(function(s) {
+        return s.ra === r;
+      });
+      setLoading(false);
+      if (!stu) {
+        setErro("RA n\xE3o encontrado");
+        setResultado(null);
+        return;
+      }
+      var pin = isPickupDay ? makePin(r, getToday()) : null;
+      setResultado({ type: "success", nome: stu.nome, turma: stu.turma, time: getNow(), pin, horario: pickupTime });
+    }
+  }
+  function acceptTerms() {
+    var nt = {};
+    Object.keys(terms).forEach(function(x) {
+      nt[x] = terms[x];
+    });
+    nt[pendingRa] = true;
+    setTerms(nt);
+    setShowTerms(false);
+    doCheckin(pendingRa);
+  }
+  var displayTime = pickupTime || "18:00 \xE0s 19:00";
+  if (showTerms) {
+    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 420, margin: "0 auto", padding: "40px 24px" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 64, mb: 20 }), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 28, border: "1px solid " + C.g200, animation: "scaleIn 0.3s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 4, borderRadius: 2, background: C.or, margin: "0 auto 20px" } }), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 20, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", textAlign: "center", marginBottom: 20 } }, "Termos de Uso"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.tx, lineHeight: 1.7, marginBottom: 24 } }, /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 12 } }, "Ao utilizar este servi\xE7o, voc\xEA declara ci\xEAncia e concorda com:"), /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 10, padding: 16, marginBottom: 12, borderLeft: "3px solid " + C.or } }, /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 8, fontWeight: 600 } }, "1. Cada aluno tem direito a 1 unidade por dia de oferta."), /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 8, fontWeight: 600 } }, "2. O c\xF3digo de retirada \xE9 pessoal e intransfer\xEDvel."), /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 8, fontWeight: 600, color: C.or } }, "3. O compartilhamento do c\xF3digo implica na perda imediata e definitiva do benef\xEDcio."), /* @__PURE__ */ React.createElement("p", { style: { fontWeight: 600 } }, "4. A retirada deve ser feita no hor\xE1rio: ", displayTime, ".")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: C.mu } }, "Seu aceite ser\xE1 registrado com data e hor\xE1rio.")), /* @__PURE__ */ React.createElement("button", { onClick: acceptTerms, style: { width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: "pointer", textTransform: "uppercase" } }, "Li e Aceito"), /* @__PURE__ */ React.createElement("button", { onClick: function() {
+      setShowTerms(false);
+    }, style: { width: "100%", padding: 10, border: "none", background: "transparent", color: C.mu, fontFamily: FB, fontSize: 13, cursor: "pointer", marginTop: 8 } }, "Cancelar"))));
+  }
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 420, margin: "0 auto", padding: "40px 24px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: C.di, fontSize: 11, cursor: "pointer", fontFamily: FB, marginBottom: 32, display: "flex", alignItems: "center", gap: 6, opacity: 0.4 } }, "\u2190 demo"), /* @__PURE__ */ React.createElement(LogoMark, { size: 72, mb: 20 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 36, mb: 8 }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, marginBottom: 24, fontSize: 13 } }, isPickupDay ? "Informe seu RA ou CPF para receber o c\xF3digo de retirada" : "Informe seu RA ou CPF para acessar o programa"), isPickupDay && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 16px", borderRadius: 10, marginBottom: 20, background: C.okB, border: "1px solid " + C.okD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16 } }, "\u{1F9C0}"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: C.ok } }, "P\xE3o de queijo dispon\xEDvel hoje \xB7 Retirada: ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "text",
+      placeholder: "RA ou CPF",
+      value: ra,
+      onChange: function(e) {
+        setRa(e.target.value);
+        setErro("");
+      },
+      onKeyDown: function(e) {
+        if (e.key === "Enter")
+          handleAccess();
+      },
+      style: { flex: 1, padding: "14px 16px", borderRadius: 10, border: "2px solid " + (erro ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 18, fontWeight: 600, outline: "none" }
+    }
+  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { padding: "14px 24px", borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 700, fontSize: 15, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", opacity: loading ? 0.7 : 1 } }, loading ? /* @__PURE__ */ React.createElement(Spinner, null) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", borderRadius: 8, background: C.orS, color: C.or, fontSize: 12, fontWeight: 600, marginBottom: 12, border: "1px solid " + C.orB } }, erro), resultado && /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 28, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 4, borderRadius: 2, background: C.or, margin: "0 auto 16px" } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 600 } }, resultado.type === "already" ? "Acesso j\xE1 registrado hoje" : "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 20, fontWeight: 800, fontFamily: FD, color: C.nv, marginBottom: 2 } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginBottom: 20, fontWeight: 500 } }, resultado.turma, " \xB7 ", resultado.time), isPickupDay && resultado.pin ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: C.nv, borderRadius: 14, padding: "24px 20px", marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 } }, "Seu c\xF3digo de retirada"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 56, fontWeight: 900, fontFamily: FM, color: C.wh, letterSpacing: "0.15em", lineHeight: 1 } }, resultado.pin), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.orL, marginTop: 10, fontWeight: 600 } }, "V\xE1lido hoje \xB7 Retirada: ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { background: C.wnB, borderRadius: 10, padding: "12px 16px", border: "1px solid " + C.wnD, textAlign: "left", marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: C.wn, marginBottom: 4 } }, "\u26A0 C\xF3digo pessoal e intransfer\xEDvel"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.wn, lineHeight: 1.5 } }, "O compartilhamento implica na perda do benef\xEDcio."))) : /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 28, marginBottom: 8 } }, "\u{1F44B}"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.mu, lineHeight: 1.6 } }, "Confira abaixo os comunicados do programa.")), resultado.type === "already" && isPickupDay && /* @__PURE__ */ React.createElement(Badge, { type: "warning" }, "C\xF3digo j\xE1 gerado hoje"), resultado.type === "success" && isPickupDay && /* @__PURE__ */ React.createElement(Badge, { type: "success" }, "C\xF3digo gerado"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 24 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 24, padding: 16, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.slice(0, 6).map(function(s) {
+    return /* @__PURE__ */ React.createElement("button", { key: s.ra, onClick: function() {
+      setRa(s.ra);
+      setResultado(null);
+      setErro("");
+    }, style: { padding: "5px 10px", borderRadius: 6, border: "1px solid " + C.g200, background: C.g50, color: C.g700, fontFamily: FM, fontSize: 11, cursor: "pointer" } }, s.ra);
+  })))));
+}
+function OperatorView(p) {
+  var isPickupDay = p.pickupActive;
+  var onBack = p.onBack;
+  var batch = p.batch;
+  var setBatch = p.setBatch;
+  var piS = useState("");
+  var pinInput = piS[0];
+  var setPinInput = piS[1];
+  var fbS = useState(null);
+  var feedback = fbS[0];
+  var setFeedback = fbS[1];
+  var rcS = useState([]);
+  var recents = rcS[0];
+  var setRecents = rcS[1];
+  var ldS = useState(false);
+  var loading = ldS[0];
+  var setLoading = ldS[1];
+  var countS = useState({ ci: 0, pk: 0 });
+  var counts = countS[0];
+  var setCounts = countS[1];
+  var inputRef = useRef(null);
+  useEffect(function() {
+    if (inputRef.current)
+      inputRef.current.focus();
+  }, []);
+  useEffect(function() {
+    if (isApiConfigured()) {
+      apiGet("statusDia").then(function(r) {
+        if (r.sucesso)
+          setCounts({ ci: r.checkins, pk: r.retiradas });
+      }).catch(function() {
+      });
+    }
+  }, []);
+  function handleConfirm() {
+    var code = pinInput.trim();
+    if (!code)
+      return;
+    setLoading(true);
+    if (isApiConfigured()) {
+      apiPost({ action: "validarPin", pin: code }).then(function(r) {
+        setLoading(false);
+        if (!r.sucesso) {
+          setFeedback({ t: r.jaRetirou ? "warning" : "error", m: r.erro });
+          setPinInput("");
+          if (inputRef.current)
+            inputRef.current.focus();
+          return;
+        }
+        setFeedback({ t: "success", m: r.mensagem });
+        setRecents(function(prev) {
+          return [{ nome: r.nome, turma: r.turma, time: r.horaRetirada }].concat(prev).slice(0, 10);
+        });
+        setCounts(function(prev) {
+          return { ci: prev.ci, pk: prev.pk + 1 };
+        });
+        if (batch.current > 0)
+          setBatch(function(prev) {
+            return { current: prev.current - 1, totalToday: prev.totalToday, batches: prev.batches, lastBatchTime: prev.lastBatchTime };
+          });
+        setPinInput("");
+        if (inputRef.current)
+          inputRef.current.focus();
+        setTimeout(function() {
+          setFeedback(null);
+        }, 4e3);
+      }).catch(function() {
+        setLoading(false);
+        setFeedback({ t: "error", m: "Erro de conex\xE3o" });
+      });
+    } else {
+      setLoading(false);
+      setFeedback({ t: "success", m: "Demo \u2014 entrega simulada" });
+      setPinInput("");
+      if (inputRef.current)
+        inputRef.current.focus();
+      setTimeout(function() {
+        setFeedback(null);
+      }, 4e3);
+    }
+  }
+  function newBatch() {
+    var q = prompt("Quantos p\xE3es nesta fornada?", "30");
+    var n = parseInt(q);
+    if (isNaN(n) || n <= 0)
+      return;
+    setBatch(function(prev) {
+      return { current: prev.current + n, totalToday: prev.totalToday + n, batches: prev.batches + 1, lastBatchTime: getNow() };
+    });
+  }
+  if (!isPickupDay) {
+    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Operador", badge: "Sem distribui\xE7\xE3o", bt: "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 40, maxWidth: 500, margin: "0 auto", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "\u{1F4CB}"), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 22, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", marginBottom: 12 } }, "Sem distribui\xE7\xE3o hoje"), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 14, lineHeight: 1.6, marginBottom: 24 } }, "O sistema est\xE1 operando sem distribui\xE7\xE3o de p\xE3o de queijo neste dia."), /* @__PURE__ */ React.createElement(MetricBox, { label: "Acessos hoje", value: counts.ci, sub: counts.ci + " alunos", accent: true })));
+  }
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Operador", badge: "Copa", bt: "success" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 24, maxWidth: 880, margin: "0 auto" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 14, marginBottom: 20, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(MetricBox, { label: "C\xF3digos gerados", value: counts.ci, sub: "alunos", accent: true }), /* @__PURE__ */ React.createElement(MetricBox, { label: "Retiradas", value: counts.pk, sub: "de " + counts.ci }), /* @__PURE__ */ React.createElement(MetricBox, { label: "Dispon\xEDveis", value: batch.current, sub: batch.current <= 5 ? "Baixo" : "Em estoque" }), /* @__PURE__ */ React.createElement(MetricBox, { label: "Fornadas", value: batch.batches, sub: batch.lastBatchTime ? "\xDAltima: " + batch.lastBatchTime : "\u2014" })), batch.current <= 5 && /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 18px", borderRadius: 10, marginBottom: 18, background: batch.current === 0 ? C.orS : C.wnB, border: "1px solid " + (batch.current === 0 ? C.orB : C.wnD), display: "flex", alignItems: "center", justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: batch.current === 0 ? C.or : C.wn } }, batch.current === 0 ? "Estoque zerado" : "Apenas " + batch.current + " restantes"), /* @__PURE__ */ React.createElement("button", { onClick: newBatch, style: { padding: "7px 14px", borderRadius: 8, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 700, fontSize: 12, cursor: "pointer", textTransform: "uppercase" } }, "+ Fornada")), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: 24, marginBottom: 20, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 32, height: 32, borderRadius: 8, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16 } }, "\u{1F511}")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 14, fontFamily: FD, textTransform: "uppercase" } }, "Validar C\xF3digo"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu } }, "PIN de 4 d\xEDgitos do aluno"))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      ref: inputRef,
+      type: "text",
+      placeholder: "PIN",
+      value: pinInput,
+      maxLength: 4,
+      onChange: function(e) {
+        setPinInput(e.target.value.replace(/\D/g, ""));
+      },
+      onKeyDown: function(e) {
+        if (e.key === "Enter")
+          handleConfirm();
+      },
+      style: { flex: 1, padding: "14px 16px", borderRadius: 10, border: "2px solid " + C.g200, background: C.g50, color: C.tx, fontFamily: FM, fontSize: 32, fontWeight: 700, outline: "none", letterSpacing: "0.2em", textAlign: "center", maxWidth: 200 }
+    }
+  ), /* @__PURE__ */ React.createElement("button", { onClick: handleConfirm, disabled: loading, style: { padding: "14px 28px", borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 15, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", whiteSpace: "nowrap", opacity: loading ? 0.7 : 1 } }, loading ? /* @__PURE__ */ React.createElement(Spinner, null) : "Confirmar"), /* @__PURE__ */ React.createElement("button", { onClick: newBatch, style: { padding: "14px 16px", borderRadius: 10, border: "1px solid " + C.g200, background: C.wh, color: C.tx, fontFamily: FD, fontWeight: 600, fontSize: 13, cursor: "pointer", whiteSpace: "nowrap", textTransform: "uppercase" } }, "+ Fornada")), feedback && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "12px 16px", borderRadius: 10, background: feedback.t === "success" ? C.okB : feedback.t === "warning" ? C.wnB : C.orS, color: feedback.t === "success" ? C.ok : feedback.t === "warning" ? C.wn : C.or, fontSize: 13, fontWeight: 600, animation: "scaleIn 0.25s ease both", border: "1px solid " + (feedback.t === "success" ? C.okD : feedback.t === "warning" ? C.wnD : C.orB) } }, feedback.t === "success" ? "\u2713" : feedback.t === "warning" ? "\u26A0" : "\u2715", " ", feedback.m)), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: 20, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 14, fontFamily: FD, marginBottom: 14, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { color: C.or } }, "\u25CF"), " \xDAltimas entregas"), recents.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 28, color: C.di, fontSize: 13 } }, "Nenhuma entrega nesta sess\xE3o") : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } }, recents.map(function(item, i) {
+    var ini = item.nome.split(" ").map(function(n) {
+      return n[0];
+    }).slice(0, 2).join("");
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: C.g50, borderLeft: "3px solid " + C.or } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 32, height: 32, borderRadius: 8, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: C.or, fontFamily: FD } }, ini), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 600, fontSize: 13 } }, item.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu } }, item.turma))), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: C.mu, fontFamily: FM } }, item.time));
+  })))));
+}
+function ConfigView(p) {
+  var activeDays = p.activeDays;
+  var setActiveDays = p.setActiveDays;
+  var onBack = p.onBack;
+  var todayDow = getDow();
+  function toggleDay(d) {
+    var nd = {};
+    Object.keys(activeDays).forEach(function(k) {
+      nd[k] = activeDays[k];
+    });
+    nd[d] = !nd[d];
+    setActiveDays(nd);
+    if (isApiConfigured()) {
+      var mapa = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
+      var dias = [];
+      Object.keys(nd).forEach(function(k) {
+        if (nd[k])
+          dias.push(mapa[parseInt(k)]);
+      });
+      apiPost({ action: "salvarDiasAtivos", dias }).catch(function() {
+      });
+    }
+  }
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Configura\xE7\xF5es", badge: "Admin", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 24, maxWidth: 600, margin: "0 auto" } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: 24, border: "1px solid " + C.g200, marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 6 } }, "Calend\xE1rio de Distribui\xE7\xE3o"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: C.mu, marginBottom: 20, lineHeight: 1.5 } }, "Defina em quais dias da semana haver\xE1 p\xE3o de queijo."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, [1, 2, 3, 4, 5].map(function(d) {
+    var on = activeDays[d];
+    var isToday = d === todayDow;
+    return /* @__PURE__ */ React.createElement("button", { key: d, onClick: function() {
+      toggleDay(d);
+    }, style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderRadius: 10, cursor: "pointer", background: on ? C.okB : C.g50, border: "2px solid " + (isToday ? C.or : on ? C.okD : C.g200) } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 700, fontFamily: FD, color: C.nv, width: 70, textAlign: "left" } }, DOW_FULL[d]), isToday && /* @__PURE__ */ React.createElement(Badge, { type: "error" }, "Hoje")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: on ? C.ok : C.mu } }, on ? "\u{1F9C0} P\xE3o de Queijo" : "Apenas app"), /* @__PURE__ */ React.createElement("div", { style: { width: 44, height: 24, borderRadius: 12, padding: 2, background: on ? C.ok : C.g300, display: "flex", alignItems: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 20, height: 20, borderRadius: 10, background: C.wh, transition: "transform 0.2s", transform: on ? "translateX(20px)" : "translateX(0)", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" } }))));
+  }))), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: 24, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 16 } }, "Resumo da Semana"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, flexWrap: "wrap" } }, [1, 2, 3, 4, 5].map(function(d) {
+    var on = activeDays[d];
+    var isToday = d === todayDow;
+    return /* @__PURE__ */ React.createElement("div", { key: d, style: { flex: 1, minWidth: 80, textAlign: "center", padding: "12px 8px", borderRadius: 10, background: isToday ? on ? C.okB : C.orS : C.g50, border: "1px solid " + (isToday ? on ? C.okD : C.orB : C.g200) } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, fontFamily: FD, color: C.nv } }, DOW_SHORT[d]), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, marginTop: 4 } }, on ? "\u{1F9C0}" : "\u{1F4F1}"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: on ? C.ok : C.mu, fontWeight: 600, marginTop: 4 } }, on ? "Ativo" : "App"));
+  })))));
+}
+function DashView(p) {
+  var isPickupDay = p.pickupActive;
+  var onBack = p.onBack;
+  var dashS = useState(null);
+  var dashData = dashS[0];
+  var setDashData = dashS[1];
+  useEffect(function() {
+    if (isApiConfigured()) {
+      apiGet("dashboard").then(function(r) {
+        if (r.sucesso)
+          setDashData(r);
+      }).catch(function() {
+      });
+    }
+  }, []);
+  var ci = dashData ? dashData.checkins : 0;
+  var pk = dashData ? dashData.retiradas : 0;
+  var waste = dashData ? dashData.desperdicio : 0;
+  var porTurma = dashData ? dashData.porTurma : {};
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Dashboard", badge: isPickupDay ? "Completo" : "Acessos", bt: isPickupDay ? "success" : "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 24, maxWidth: 880, margin: "0 auto" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 14, marginBottom: 20, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(MetricBox, { label: "Acessos", value: ci, accent: true }), isPickupDay && /* @__PURE__ */ React.createElement(MetricBox, { label: "Retiradas", value: pk }), isPickupDay && /* @__PURE__ */ React.createElement(MetricBox, { label: "Sobra est.", value: waste })), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: 22, border: "1px solid " + C.g200, marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 13, fontFamily: FD, textTransform: "uppercase", marginBottom: 18, color: C.nv } }, "Por Turma"), Object.keys(porTurma).length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 20, color: C.di, fontSize: 12 } }, "Sem dados \u2014 os dados aparecem ap\xF3s o primeiro acesso do dia") : Object.entries(porTurma).sort(function(a, b) {
+    return b[1].checkins - a[1].checkins;
+  }).map(function(e) {
+    return /* @__PURE__ */ React.createElement("div", { key: e[0], style: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, background: C.g50, marginBottom: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600, fontFamily: FD } }, e[0] || "\u2014"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement("span", { style: { padding: "2px 8px", borderRadius: 6, background: C.orS, color: C.or, fontSize: 11, fontWeight: 700, fontFamily: FM } }, e[1].checkins), isPickupDay && /* @__PURE__ */ React.createElement("span", { style: { padding: "2px 8px", borderRadius: 6, background: C.okB, color: C.ok, fontSize: 11, fontWeight: 700, fontFamily: FM } }, e[1].retiradas, " ret.")));
+  })), !dashData && /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: 40, color: C.mu } }, isApiConfigured() ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Spinner, null), /* @__PURE__ */ React.createElement("p", { style: { marginTop: 12, fontSize: 13 } }, "Carregando dados...")) : /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13 } }, "Conecte a API para ver dados reais."))));
+}
+function StatusView(p) {
+  var batch = p.batch;
+  var isPickupDay = p.pickupActive;
+  var pickupTime = p.pickupTime;
+  var onBack = p.onBack;
+  var statusS = useState({ ci: 0, pk: 0 });
+  var status = statusS[0];
+  var setStatus = statusS[1];
+  var clkS = useState(getNow());
+  var clock = clkS[0];
+  var setClock = clkS[1];
+  useEffect(function() {
+    var t = setInterval(function() {
+      setClock(getNow());
+    }, 1e4);
+    return function() {
+      clearInterval(t);
+    };
+  }, []);
+  useEffect(function() {
+    function poll() {
+      if (isApiConfigured()) {
+        apiGet("statusDia").then(function(r) {
+          if (r.sucesso)
+            setStatus({ ci: r.checkins, pk: r.retiradas });
+        }).catch(function() {
+        });
+      }
+    }
+    poll();
+    var interval = setInterval(poll, 3e4);
+    return function() {
+      clearInterval(interval);
+    };
+  }, []);
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.wh, fontFamily: FD, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { position: "absolute", top: 16, left: 16, background: "none", border: "none", color: C.mu, fontSize: 13, cursor: "pointer", fontFamily: FB, zIndex: 10 } }, "\u2190 Menu"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 96, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 52, mb: 12 }), isPickupDay ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 14, fontFamily: FB, marginBottom: 48 } }, "Retirada: ", pickupTime || "18:00 \xE0s 19:00"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 24, justifyContent: "center", marginBottom: 48, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 20, padding: "32px 44px", border: "1px solid " + C.g200, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 64, fontWeight: 900, lineHeight: 1, color: batch.current > 0 ? C.ok : C.or } }, batch.current), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: C.mu, marginTop: 10, fontFamily: FB } }, batch.current > 0 ? "p\xE3es dispon\xEDveis" : "aguarde fornada")), /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 20, padding: "32px 44px", border: "1px solid " + C.g200, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 64, fontWeight: 900, color: C.nv, lineHeight: 1 } }, status.pk), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: C.mu, marginTop: 10, fontFamily: FB } }, "retiradas hoje"))), /* @__PURE__ */ React.createElement("div", { style: { background: batch.current > 0 ? C.okB : C.wnB, borderRadius: 14, padding: "18px 36px", display: "inline-block", border: "1px solid " + (batch.current > 0 ? C.okD : C.wnD) } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20, fontWeight: 700, color: batch.current > 0 ? C.ok : C.wn, textTransform: "uppercase" } }, batch.current > 0 ? "\u2713 Servindo agora" : "Pr\xF3xima fornada em preparo"))) : /* @__PURE__ */ React.createElement("div", { style: { padding: "24px 32px", background: C.g50, borderRadius: 16, border: "1px solid " + C.g200, display: "inline-block" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: C.mu, textTransform: "uppercase" } }, "Sem distribui\xE7\xE3o hoje")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 36, fontSize: 13, color: C.di, fontFamily: FM } }, clock))), /* @__PURE__ */ React.createElement(Stripe, null));
+}
+var ADMIN_CODE = "1234";
+function AdminPanel(p) {
+  var setView = p.setView;
+  var isPickupDay = p.isPickupDay;
+  var onBack = p.onBack;
+  var authS = useState(false);
+  var isAuth = authS[0];
+  var setAuth = authS[1];
+  var pinS = useState("");
+  var adminPin = pinS[0];
+  var setAdminPin = pinS[1];
+  var errS = useState("");
+  var pinErr = errS[0];
+  var setPinErr = errS[1];
+  var inputRef = useRef(null);
+  useEffect(function() {
+    if (inputRef.current)
+      inputRef.current.focus();
+  }, []);
+  function handleLogin() {
+    if (adminPin === ADMIN_CODE) {
+      setAuth(true);
+      setPinErr("");
+    } else {
+      setPinErr("C\xF3digo incorreto");
+      setAdminPin("");
+      if (inputRef.current)
+        inputRef.current.focus();
+    }
+  }
+  if (!isAuth) {
+    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "\xC1rea Restrita", bt: "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 360, animation: "fadeUp 0.4s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "\u{1F512}"), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 22, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", marginBottom: 8 } }, "Acesso Restrito"), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 28, lineHeight: 1.5 } }, "Digite o c\xF3digo de acesso da gest\xE3o."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        ref: inputRef,
+        type: "password",
+        placeholder: "C\xF3digo",
+        value: adminPin,
+        maxLength: 8,
+        onChange: function(e) {
+          setAdminPin(e.target.value);
+          setPinErr("");
+        },
+        onKeyDown: function(e) {
+          if (e.key === "Enter")
+            handleLogin();
+        },
+        style: { flex: 1, padding: "14px 16px", borderRadius: 10, border: "2px solid " + (pinErr ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 24, fontWeight: 700, outline: "none", textAlign: "center", letterSpacing: "0.15em" }
+      }
+    ), /* @__PURE__ */ React.createElement("button", { onClick: handleLogin, style: { padding: "14px 24px", borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 15, cursor: "pointer", textTransform: "uppercase" } }, "Entrar")), pinErr && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", borderRadius: 8, background: C.orS, color: C.or, fontSize: 12, fontWeight: 600, border: "1px solid " + C.orB } }, pinErr))));
+  }
+  var items = [
+    { id: "operator", icon: "\u{1F511}", t: "Painel do Operador", d: isPickupDay ? "Validar c\xF3digo e entregar" : "Sem distribui\xE7\xE3o hoje" },
+    { id: "dashboard", icon: "\u{1F4CA}", t: "Dashboard", d: "Relat\xF3rios e indicadores" },
+    { id: "status", icon: "\u{1F4FA}", t: "Tela da Copa", d: "Painel p\xFAblico" },
+    { id: "config", icon: "\u2699\uFE0F", t: "Configura\xE7\xF5es", d: "Calend\xE1rio de distribui\xE7\xE3o" }
+  ];
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Gest\xE3o", badge: "Admin", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 480 } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 16px", borderRadius: 10, marginBottom: 28, background: isPickupDay ? C.okB : C.g100, border: "1px solid " + (isPickupDay ? C.okD : C.g200), display: "inline-flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14 } }, isPickupDay ? "\u{1F9C0}" : "\u{1F4F1}"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: isPickupDay ? C.ok : C.g500 } }, isPickupDay ? DOW_FULL[getDow()] + ": Distribui\xE7\xE3o ativa" : DOW_FULL[getDow()] + ": Apenas app")), /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 } }, items.map(function(item, i) {
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: item.id,
+        onClick: function() {
+          setView(item.id);
+        },
+        style: { background: C.wh, border: "1px solid " + C.g200, borderRadius: 14, padding: item.id === "config" ? 18 : 24, cursor: "pointer", textAlign: "left", transition: "all 0.25s ease", animation: "fadeUp 0.45s ease both", animationDelay: 0.08 + i * 0.06 + "s", borderTop: "3px solid transparent", gridColumn: item.id === "config" ? "1 / -1" : "auto" },
+        onMouseEnter: function(e) {
+          e.currentTarget.style.borderTopColor = C.or;
+          e.currentTarget.style.transform = "translateY(-3px)";
+        },
+        onMouseLeave: function(e) {
+          e.currentTarget.style.borderTopColor = "transparent";
+          e.currentTarget.style.transform = "translateY(0)";
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: item.id === "config" ? 22 : 28, marginBottom: item.id === "config" ? 6 : 10 } }, item.icon),
+      /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: item.id === "config" ? 14 : 16, color: C.nv, marginBottom: 3, textTransform: "uppercase" } }, item.t),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu } }, item.d)
+    );
+  })))), /* @__PURE__ */ React.createElement(Stripe, null));
+}
+function App() {
+  var vS = useState("menu");
+  var view = vS[0];
+  var setView = vS[1];
+  var tmS = useState({});
+  var terms = tmS[0];
+  var setTerms = tmS[1];
+  var btS = useState({ current: 0, totalToday: 0, batches: 0, lastBatchTime: null });
+  var batch = btS[0];
+  var setBatch = btS[1];
+  var adS = useState({ 1: true, 2: true, 3: true, 4: true, 5: true });
+  var activeDays = adS[0];
+  var setActiveDays = adS[1];
+  var avS = useState(DEMO_AVISOS);
+  var avisos = avS[0];
+  var setAvisos = avS[1];
+  var ptS = useState("18:00 \xE0s 19:00");
+  var pickupTime = ptS[0];
+  var setPickupTime = ptS[1];
+  useEffect(function() {
+    if (!isApiConfigured())
+      return;
+    apiGet("diasAtivos").then(function(r) {
+      if (r.sucesso) {
+        var mapa = { DOM: 0, SEG: 1, TER: 2, QUA: 3, QUI: 4, SEX: 5, SAB: 6 };
+        var obj = {};
+        r.dias.forEach(function(d) {
+          obj[mapa[d]] = true;
+        });
+        setActiveDays(obj);
+        if (r.horario)
+          setPickupTime(r.horario);
+      }
+    }).catch(function() {
+    });
+    apiGet("avisos").then(function(r) {
+      if (r.sucesso && r.avisos.length > 0)
+        setAvisos(r.avisos);
+    }).catch(function() {
+    });
+  }, []);
+  var isPickupDay = activeDays[getDow()] || false;
+  var sharedProps = {
+    terms,
+    setTerms,
+    batch,
+    setBatch,
+    activeDays,
+    setActiveDays,
+    pickupActive: isPickupDay,
+    pickupTime,
+    avisos,
+    onBack: function() {
+      setView("menu");
+    }
+  };
+  var adminBack = function() {
+    setView("admin");
+  };
+  if (view === "checkin")
+    return /* @__PURE__ */ React.createElement(StudentView, __spreadValues({}, sharedProps));
+  if (view === "operator")
+    return /* @__PURE__ */ React.createElement(OperatorView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack }));
+  if (view === "dashboard")
+    return /* @__PURE__ */ React.createElement(DashView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack }));
+  if (view === "status")
+    return /* @__PURE__ */ React.createElement(StatusView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack }));
+  if (view === "config")
+    return /* @__PURE__ */ React.createElement(ConfigView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack }));
+  if (view === "admin")
+    return /* @__PURE__ */ React.createElement(AdminPanel, { setView, isPickupDay, onBack: function() {
+      setView("menu");
+    } });
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 88, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 48, mb: 8 }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 40 } }, "Programa Faculdade Municipal de S\xE3o Bernardo do Campo"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14 } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: function() {
+        setView("checkin");
+      },
+      style: { background: C.or, border: "none", borderRadius: 16, padding: "28px 24px", cursor: "pointer", textAlign: "left", transition: "all 0.25s ease", boxShadow: "0 4px 20px " + C.orG, display: "flex", alignItems: "center", gap: 16, animation: "fadeUp 0.45s ease both", animationDelay: "0.1s" },
+      onMouseEnter: function(e) {
+        e.currentTarget.style.transform = "translateY(-3px)";
+      },
+      onMouseLeave: function(e) {
+        e.currentTarget.style.transform = "translateY(0)";
+      }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 36 } }, "\u{1F4F1}"),
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 800, fontSize: 20, color: C.wh, textTransform: "uppercase", marginBottom: 2 } }, "Sou Aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.8)" } }, isPickupDay ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos")),
+    /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 20, color: "rgba(255,255,255,0.6)" } }, "\u2192")
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: function() {
+        setView("admin");
+      },
+      style: { background: C.wh, border: "1px solid " + C.g200, borderRadius: 12, padding: "16px 20px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 12, animation: "fadeUp 0.45s ease both", animationDelay: "0.2s" },
+      onMouseEnter: function(e) {
+        e.currentTarget.style.borderColor = C.or;
+      },
+      onMouseLeave: function(e) {
+        e.currentTarget.style.borderColor = C.g200;
+      }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 20 } }, "\u{1F512}"),
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: 14, color: C.nv, textTransform: "uppercase" } }, "\xC1rea Administrativa"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu } }, "Operador, dashboard e configura\xE7\xF5es")),
+    /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 14, color: C.di } }, "\u2192")
+  )), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 32 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 16, padding: "12px 16px", borderRadius: 10, background: C.wh, border: "1px solid " + C.g200, fontSize: 10, color: C.di, textAlign: "center" } }, "Modo demonstra\xE7\xE3o \xB7 Configure API_URL para conectar ao Google Sheets"))), /* @__PURE__ */ React.createElement(Stripe, null));
+}
+var root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(App));
+
+</script>
+</body>
+</html>
