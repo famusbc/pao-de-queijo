@@ -165,7 +165,15 @@ function LogoMark(p) {
 }
 function PageTitle(p) {
   var sz = p.size || 48;
-  return /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("h1", { style: { fontSize: sz, fontWeight: 900, fontFamily: FD, color: C.nv, letterSpacing: "0.02em", textTransform: "uppercase", marginBottom: 4, lineHeight: 1.1 } }, "P\xE3o de Queijo"), /* @__PURE__ */ React.createElement("div", { style: { width: 48, height: 4, borderRadius: 2, background: C.or, margin: "4px auto 8px" } }), /* @__PURE__ */ React.createElement("p", { style: { color: C.or, fontSize: Math.max(12, sz * 0.28), fontWeight: 700, fontFamily: FD, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: p.mb || 32 } }, "cidade pra frente"));
+  var showPdq = p.showPdq !== false;
+  if (showPdq) {
+    return /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("h1", { style: { fontSize: sz, fontWeight: 900, fontFamily: FD, color: C.nv, letterSpacing: "0.02em", textTransform: "uppercase", marginBottom: 4, lineHeight: 1.1 } }, "P\xE3o de Queijo"), /* @__PURE__ */ React.createElement("div", { style: { width: 48, height: 4, borderRadius: 2, background: C.or, margin: "4px auto 8px" } }), /* @__PURE__ */ React.createElement("p", { style: { color: C.or, fontSize: Math.max(12, sz * 0.28), fontWeight: 700, fontFamily: FD, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: p.mb || 32 } }, "cidade pra frente"));
+  }
+  return /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("h1", { style: { fontSize: Math.max(18, sz * 0.45), fontWeight: 800, fontFamily: FD, color: C.nv, letterSpacing: "0.01em", lineHeight: 1.2, marginBottom: 4 } }, "Programa Faculdade Municipal"), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: Math.max(14, sz * 0.35), fontWeight: 700, fontFamily: FD, color: C.nv, lineHeight: 1.2, marginBottom: 4 } }, "de S\xE3o Bernardo do Campo"), /* @__PURE__ */ React.createElement("div", { style: { width: 48, height: 4, borderRadius: 2, background: C.or, margin: "4px auto 8px" } }), /* @__PURE__ */ React.createElement("p", { style: { color: C.or, fontSize: Math.max(12, sz * 0.28), fontWeight: 700, fontFamily: FD, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: p.mb || 32 } }, "cidade pra frente"));
+}
+function isDentroDoHorario() {
+  var h = (/* @__PURE__ */ new Date()).getHours();
+  return h >= 18 && h < 20;
 }
 function Spinner() {
   return /* @__PURE__ */ React.createElement("div", { style: { display: "inline-block", width: 20, height: 20, border: "3px solid " + C.g200, borderTopColor: C.or, borderRadius: "50%", animation: "spin 0.6s linear infinite" } });
@@ -268,7 +276,7 @@ function StudentView(p) {
       setShowTerms(false);
     }, style: { width: "100%", padding: 10, border: "none", background: "transparent", color: C.mu, fontFamily: FB, fontSize: 13, cursor: "pointer", marginTop: 8 } }, "Cancelar"))));
   }
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 420, margin: "0 auto", padding: "32px 16px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: C.di, fontSize: 11, cursor: "pointer", fontFamily: FB, marginBottom: 32, display: "flex", alignItems: "center", gap: 6, opacity: 0.4 } }, "\u2190 demo"), /* @__PURE__ */ React.createElement(LogoMark, { size: 64, mb: 16 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 30, mb: 6 }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, marginBottom: 24, fontSize: 13 } }, isPickupDay ? "Informe seu RA ou CPF para receber o c\xF3digo de retirada" : "Informe seu RA ou CPF para acessar o programa"), isPickupDay && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 16px", borderRadius: 10, marginBottom: 20, background: C.okB, border: "1px solid " + C.okD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16 } }, "\u{1F9C0}"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: C.ok } }, "P\xE3o de queijo dispon\xEDvel hoje \xB7 Retirada: ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 420, margin: "0 auto", padding: "32px 16px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: C.di, fontSize: 11, cursor: "pointer", fontFamily: FB, marginBottom: 32, display: "flex", alignItems: "center", gap: 6, opacity: 0.4 } }, "\u2190 demo"), /* @__PURE__ */ React.createElement(LogoMark, { size: 64, mb: 16 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 30, mb: 6, showPdq: isPickupDay && isDentroDoHorario() }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, marginBottom: 24, fontSize: 13 } }, isPickupDay && isDentroDoHorario() ? "Informe seu RA ou CPF para receber o c\xF3digo de retirada" : "Informe seu RA ou CPF para acessar o programa"), isPickupDay && isDentroDoHorario() && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 16px", borderRadius: 10, marginBottom: 20, background: C.okB, border: "1px solid " + C.okD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16 } }, "\u{1F9C0}"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: C.ok } }, "P\xE3o de queijo dispon\xEDvel hoje \xB7 Retirada: ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
     "input",
     {
       type: "text",
@@ -511,9 +519,8 @@ function AdminPanel(p) {
   var setView = p.setView;
   var isPickupDay = p.isPickupDay;
   var onBack = p.onBack;
-  var authS = useState(false);
-  var isAuth = authS[0];
-  var setAuth = authS[1];
+  var isAuth = p.adminAuth;
+  var setAuth = p.setAdminAuth;
   var pinS = useState("");
   var adminPin = pinS[0];
   var setAdminPin = pinS[1];
@@ -606,6 +613,9 @@ function App() {
   var ptS = useState("18:00 \xE0s 19:00");
   var pickupTime = ptS[0];
   var setPickupTime = ptS[1];
+  var aaS = useState(false);
+  var adminAuth = aaS[0];
+  var setAdminAuth = aaS[1];
   useEffect(function() {
     if (!isApiConfigured())
       return;
@@ -657,10 +667,10 @@ function App() {
   if (view === "config")
     return /* @__PURE__ */ React.createElement(ConfigView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack }));
   if (view === "admin")
-    return /* @__PURE__ */ React.createElement(AdminPanel, { setView, isPickupDay, onBack: function() {
+    return /* @__PURE__ */ React.createElement(AdminPanel, { setView, isPickupDay, adminAuth, setAdminAuth, onBack: function() {
       setView("menu");
     } });
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 88, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 48, mb: 8 }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 40 } }, "Programa Faculdade Municipal de S\xE3o Bernardo do Campo"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14 } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 88, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 48, mb: 8, showPdq: isPickupDay && isDentroDoHorario() }), !(isPickupDay && isDentroDoHorario()) && /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 40 } }, "Programa Faculdade Municipal de S\xE3o Bernardo do Campo"), isPickupDay && isDentroDoHorario() && /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 40 } }, "Programa Faculdade Municipal de S\xE3o Bernardo do Campo"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: function() {
@@ -675,7 +685,7 @@ function App() {
       }
     },
     /* @__PURE__ */ React.createElement("div", { style: { fontSize: 36 } }, "\u{1F4F1}"),
-    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 800, fontSize: 20, color: C.wh, textTransform: "uppercase", marginBottom: 2 } }, "Sou Aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.8)" } }, isPickupDay ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos")),
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 800, fontSize: 20, color: C.wh, textTransform: "uppercase", marginBottom: 2 } }, "Sou Aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.8)" } }, isPickupDay && isDentroDoHorario() ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos")),
     /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 20, color: "rgba(255,255,255,0.6)" } }, "\u2192")
   ), /* @__PURE__ */ React.createElement(
     "button",
