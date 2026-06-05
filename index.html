@@ -91,6 +91,10 @@ var FD = "'Barlow Condensed','Arial Narrow',sans-serif";
 var FB = "'Barlow','Helvetica Neue',sans-serif";
 var FM = "'IBM Plex Mono','SF Mono',monospace";
 var WA_LINK = "https://wa.me/551123633775";
+function getUrlParam(name) {
+  var params = new URLSearchParams(window.location.search);
+  return params.get(name) || "";
+}
 var DEMO_STU = [
   { ra: "2024001", nome: "Ana Carolina Silva", turma: "ADM-3A" },
   { ra: "2024002", nome: "Bruno Ferreira Costa", turma: "DIR-2B" },
@@ -194,6 +198,7 @@ function StudentView(p) {
   var onBack = p.onBack;
   var terms = p.terms;
   var setTerms = p.setTerms;
+  var dailyKey = p.dailyKey || "";
   var raS = useState("");
   var ra = raS[0];
   var setRa = raS[1];
@@ -227,7 +232,7 @@ function StudentView(p) {
   function doCheckin(r) {
     setLoading(true);
     if (isApiConfigured()) {
-      apiPost({ action: "checkin", ra: r }).then(function(resp) {
+      apiPost({ action: "checkin", ra: r, k: dailyKey }).then(function(resp) {
         setLoading(false);
         if (!resp.sucesso) {
           setErro(resp.erro);
@@ -270,7 +275,7 @@ function StudentView(p) {
     setShowTerms(false);
     doCheckin(pendingRa);
   }
-  var displayTime = pickupTime || "18:00 \xE0s 19:00";
+  var displayTime = pickupTime || "18:00 \xE0s 20:00";
   if (showTerms) {
     return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 420, margin: "0 auto", padding: "40px 24px" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 64, mb: 20 }), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 28, border: "1px solid " + C.g200, animation: "scaleIn 0.3s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 4, borderRadius: 2, background: C.or, margin: "0 auto 20px" } }), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 20, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", textAlign: "center", marginBottom: 20 } }, "Termos de Uso"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.tx, lineHeight: 1.7, marginBottom: 24 } }, /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 12 } }, "Ao utilizar este servi\xE7o, voc\xEA declara ci\xEAncia e concorda com:"), /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 10, padding: 16, marginBottom: 12, borderLeft: "3px solid " + C.or } }, /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 8, fontWeight: 600 } }, "1. Cada aluno tem direito a 1 unidade por dia de oferta."), /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 8, fontWeight: 600 } }, "2. O c\xF3digo de retirada \xE9 pessoal e intransfer\xEDvel."), /* @__PURE__ */ React.createElement("p", { style: { marginBottom: 8, fontWeight: 600, color: C.or } }, "3. O compartilhamento do c\xF3digo implica na perda imediata e definitiva do benef\xEDcio."), /* @__PURE__ */ React.createElement("p", { style: { fontWeight: 600 } }, "4. A retirada deve ser feita no hor\xE1rio: ", displayTime, ".")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 11, color: C.mu } }, "Seu aceite ser\xE1 registrado com data e hor\xE1rio.")), /* @__PURE__ */ React.createElement("button", { onClick: acceptTerms, style: { width: "100%", padding: 14, borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: "pointer", textTransform: "uppercase" } }, "Li e Aceito"), /* @__PURE__ */ React.createElement("button", { onClick: function() {
       setShowTerms(false);
@@ -488,6 +493,9 @@ function StatusView(p) {
   var clkS = useState(getNow());
   var clock = clkS[0];
   var setClock = clkS[1];
+  var qrS = useState("");
+  var qrUrl = qrS[0];
+  var setQrUrl = qrS[1];
   useEffect(function() {
     var t = setInterval(function() {
       setClock(getNow());
@@ -512,7 +520,26 @@ function StatusView(p) {
       clearInterval(interval);
     };
   }, []);
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.wh, fontFamily: FD, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { position: "absolute", top: 16, left: 16, background: "none", border: "none", color: C.mu, fontSize: 13, cursor: "pointer", fontFamily: FB, zIndex: 10 } }, "\u2190 Menu"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 96, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 52, mb: 12 }), isPickupDay ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 14, fontFamily: FB, marginBottom: 48 } }, "Retirada: ", pickupTime || "18:00 \xE0s 19:00"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 24, justifyContent: "center", marginBottom: 48, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 20, padding: "32px 44px", border: "1px solid " + C.g200, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 64, fontWeight: 900, lineHeight: 1, color: batch.current > 0 ? C.ok : C.or } }, batch.current), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: C.mu, marginTop: 10, fontFamily: FB } }, batch.current > 0 ? "p\xE3es dispon\xEDveis" : "aguarde fornada")), /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 20, padding: "32px 44px", border: "1px solid " + C.g200, minWidth: 200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 64, fontWeight: 900, color: C.nv, lineHeight: 1 } }, status.pk), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, color: C.mu, marginTop: 10, fontFamily: FB } }, "retiradas hoje"))), /* @__PURE__ */ React.createElement("div", { style: { background: batch.current > 0 ? C.okB : C.wnB, borderRadius: 14, padding: "18px 36px", display: "inline-block", border: "1px solid " + (batch.current > 0 ? C.okD : C.wnD) } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20, fontWeight: 700, color: batch.current > 0 ? C.ok : C.wn, textTransform: "uppercase" } }, batch.current > 0 ? "\u2713 Servindo agora" : "Pr\xF3xima fornada em preparo"))) : /* @__PURE__ */ React.createElement("div", { style: { padding: "24px 32px", background: C.g50, borderRadius: 16, border: "1px solid " + C.g200, display: "inline-block" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: C.mu, textTransform: "uppercase" } }, "Sem distribui\xE7\xE3o hoje")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 36, fontSize: 13, color: C.di, fontFamily: FM } }, clock))), /* @__PURE__ */ React.createElement(Stripe, null));
+  useEffect(function() {
+    function loadQR() {
+      if (isApiConfigured()) {
+        apiGet("qrcodeDia").then(function(r) {
+          if (r.sucesso) {
+            var url = "https://famusbc.github.io/pao-de-queijo/?k=" + r.chave;
+            setQrUrl(url);
+          }
+        }).catch(function() {
+        });
+      }
+    }
+    loadQR();
+    var interval = setInterval(loadQR, 3e5);
+    return function() {
+      clearInterval(interval);
+    };
+  }, []);
+  var qrImgUrl = qrUrl ? "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(qrUrl) : "";
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.wh, fontFamily: FD, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { position: "absolute", top: 16, left: 16, background: "none", border: "none", color: C.mu, fontSize: 13, cursor: "pointer", fontFamily: FB, zIndex: 10 } }, "\u2190 Menu"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 80, mb: 20 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 42, mb: 8, showPdq: isPickupDay && isDentroDoHorario() }), isPickupDay ? /* @__PURE__ */ React.createElement("div", null, isDentroDoHorario() && /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 14, fontFamily: FB, marginBottom: 32 } }, "Retirada: ", pickupTime || "18:00 \xE0s 20:00"), qrImgUrl && /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 20, padding: 24, border: "2px solid " + C.g200, display: "inline-block", marginBottom: 32, boxShadow: "0 4px 20px rgba(0,0,0,0.06)" } }, /* @__PURE__ */ React.createElement("img", { src: qrImgUrl, alt: "QR Code", style: { width: 220, height: 220, display: "block" } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, marginTop: 12, fontFamily: FB } }, "Escaneie com a c\xE2mera do celular")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 24, justifyContent: "center", marginBottom: 32, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 20, padding: "24px 36px", border: "1px solid " + C.g200, minWidth: 160 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, fontWeight: 900, lineHeight: 1, color: batch.current > 0 ? C.ok : C.or } }, batch.current), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.mu, marginTop: 8, fontFamily: FB } }, batch.current > 0 ? "p\xE3es dispon\xEDveis" : "aguarde fornada")), /* @__PURE__ */ React.createElement("div", { style: { background: C.g50, borderRadius: 20, padding: "24px 36px", border: "1px solid " + C.g200, minWidth: 160 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, fontWeight: 900, color: C.nv, lineHeight: 1 } }, status.pk), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.mu, marginTop: 8, fontFamily: FB } }, "retiradas hoje"))), isDentroDoHorario() && /* @__PURE__ */ React.createElement("div", { style: { background: batch.current > 0 ? C.okB : C.wnB, borderRadius: 14, padding: "14px 28px", display: "inline-block", border: "1px solid " + (batch.current > 0 ? C.okD : C.wnD) } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, fontWeight: 700, color: batch.current > 0 ? C.ok : C.wn, textTransform: "uppercase" } }, batch.current > 0 ? "\u2713 Servindo agora" : "Pr\xF3xima fornada em preparo"))) : /* @__PURE__ */ React.createElement("div", { style: { padding: "24px 32px", background: C.g50, borderRadius: 16, border: "1px solid " + C.g200, display: "inline-block" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 18, fontWeight: 700, color: C.mu, textTransform: "uppercase" } }, "Sem distribui\xE7\xE3o hoje")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 28, fontSize: 13, color: C.di, fontFamily: FM } }, clock))), /* @__PURE__ */ React.createElement(Stripe, null));
 }
 var ADMIN_CODE = "Famu#83";
 function AdminPanel(p) {
@@ -610,12 +637,14 @@ function App() {
   var avS = useState(DEMO_AVISOS);
   var avisos = avS[0];
   var setAvisos = avS[1];
-  var ptS = useState("18:00 \xE0s 19:00");
+  var ptS = useState("18:00 \xE0s 20:00");
   var pickupTime = ptS[0];
   var setPickupTime = ptS[1];
   var aaS = useState(false);
   var adminAuth = aaS[0];
   var setAdminAuth = aaS[1];
+  var dkS = useState(getUrlParam("k"));
+  var dailyKey = dkS[0];
   useEffect(function() {
     if (!isApiConfigured())
       return;
@@ -649,6 +678,7 @@ function App() {
     pickupActive: isPickupDay,
     pickupTime,
     avisos,
+    dailyKey,
     onBack: function() {
       setView("menu");
     }
@@ -670,7 +700,7 @@ function App() {
     return /* @__PURE__ */ React.createElement(AdminPanel, { setView, isPickupDay, adminAuth, setAdminAuth, onBack: function() {
       setView("menu");
     } });
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 88, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 48, mb: 8, showPdq: isPickupDay && isDentroDoHorario() }), !(isPickupDay && isDentroDoHorario()) && /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 40 } }, "Programa Faculdade Municipal de S\xE3o Bernardo do Campo"), isPickupDay && isDentroDoHorario() && /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 40 } }, "Programa Faculdade Municipal de S\xE3o Bernardo do Campo"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14 } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 88, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 48, mb: 32, showPdq: isPickupDay && isDentroDoHorario() }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: function() {
