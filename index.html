@@ -571,7 +571,7 @@ function AdminPanel(p) {
     }
   }
   if (!isAuth) {
-    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "\xC1rea Restrita", bt: "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 360, animation: "fadeUp 0.4s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "\u{1F512}"), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 22, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", marginBottom: 8 } }, "Acesso Restrito"), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 28, lineHeight: 1.5 } }, "Digite o c\xF3digo de acesso da gest\xE3o."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "\xC1rea Restrita", bt: "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 360, animation: "fadeUp 0.4s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 48, marginBottom: 16 } }, "\u{1F512}"), /* @__PURE__ */ React.createElement("h2", { style: { fontSize: 22, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", marginBottom: 8 } }, "Acesso Restrito"), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 28, lineHeight: 1.5 } }, "Digite o c\xF3digo de acesso da gest\xE3o."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(
       "input",
       {
         ref: inputRef,
@@ -587,9 +587,9 @@ function AdminPanel(p) {
           if (e.key === "Enter")
             handleLogin();
         },
-        style: { flex: 1, padding: "14px 16px", borderRadius: 10, border: "2px solid " + (pinErr ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 24, fontWeight: 700, outline: "none", textAlign: "center", letterSpacing: "0.15em" }
+        style: { width: "100%", padding: "14px 16px", borderRadius: 10, border: "2px solid " + (pinErr ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 24, fontWeight: 700, outline: "none", textAlign: "center", letterSpacing: "0.15em", boxSizing: "border-box" }
       }
-    ), /* @__PURE__ */ React.createElement("button", { onClick: handleLogin, style: { padding: "14px 24px", borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 15, cursor: "pointer", textTransform: "uppercase" } }, "Entrar")), pinErr && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", borderRadius: 8, background: C.orS, color: C.or, fontSize: 12, fontWeight: 600, border: "1px solid " + C.orB } }, pinErr))));
+    ), /* @__PURE__ */ React.createElement("button", { onClick: handleLogin, style: { width: "100%", padding: "14px 24px", borderRadius: 10, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 15, cursor: "pointer", textTransform: "uppercase" } }, "Entrar")), pinErr && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 14px", borderRadius: 8, background: C.orS, color: C.or, fontSize: 12, fontWeight: 600, border: "1px solid " + C.orB } }, pinErr))));
   }
   var items = [
     { id: "operator", icon: "\u{1F511}", t: "Painel do Operador", d: isPickupDay ? "Validar c\xF3digo e entregar" : "Sem distribui\xE7\xE3o hoje" },
@@ -698,6 +698,7 @@ function App() {
     return /* @__PURE__ */ React.createElement(ConfigView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack }));
   if (view === "admin")
     return /* @__PURE__ */ React.createElement(AdminPanel, { setView, isPickupDay, adminAuth, setAdminAuth, onBack: function() {
+      setAdminAuth(false);
       setView("menu");
     } });
   return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(Stripe, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 88, mb: 24 }), /* @__PURE__ */ React.createElement(PageTitle, { size: 48, mb: 32, showPdq: isPickupDay && isDentroDoHorario() }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14 } }, /* @__PURE__ */ React.createElement(
