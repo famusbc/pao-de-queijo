@@ -147,26 +147,6 @@ function dentroDoHorario(str) {
   var nowMin = now.getHours() * 60 + now.getMinutes();
   return nowMin >= hr.startMin && nowMin < hr.endMin;
 }
-var BATCH_KEY = "famu_batch_v1";
-function loadBatch() {
-  try {
-    var raw = window.localStorage.getItem(BATCH_KEY);
-    if (!raw)
-      return { current: 0, served: 0, batches: 0, lastBatchTime: null, date: getToday() };
-    var obj = JSON.parse(raw);
-    if (obj.date !== getToday())
-      return { current: 0, served: 0, batches: 0, lastBatchTime: null, date: getToday() };
-    return obj;
-  } catch (e) {
-    return { current: 0, served: 0, batches: 0, lastBatchTime: null, date: getToday() };
-  }
-}
-function saveBatch(b) {
-  try {
-    window.localStorage.setItem(BATCH_KEY, JSON.stringify(b));
-  } catch (e) {
-  }
-}
 var GCSS = [
   "@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');",
   "*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}",
@@ -410,16 +390,19 @@ function OperatorView(p) {
   var acLdS = useState(false);
   var adminLoading = acLdS[0];
   var setAdminLoading = acLdS[1];
+  function aplicarStatus(r) {
+    setCounts({ ci: r.checkins, pk: r.retiradas });
+    if (r.ultimas)
+      setRecents(r.ultimas);
+    setBatch({ current: r.estoque != null ? r.estoque : 0, served: r.retiradas, batches: r.fornadaCount != null ? r.fornadaCount : 0, lastBatchTime: r.fornadaHora || "" });
+  }
   function refreshCounts() {
     if (!isApiConfigured())
       return;
     setRefreshing(true);
     apiGet("statusDia").then(function(r) {
-      if (r.sucesso) {
-        setCounts({ ci: r.checkins, pk: r.retiradas });
-        if (r.ultimas && r.ultimas.length >= 0)
-          setRecents(r.ultimas);
-      }
+      if (r.sucesso)
+        aplicarStatus(r);
       setRefreshing(false);
     }).catch(function() {
       setRefreshing(false);
@@ -460,10 +443,9 @@ function OperatorView(p) {
         setCounts(function(prev) {
           return { ci: prev.ci, pk: prev.pk + 1 };
         });
-        if (batch.current > 0)
-          setBatch(function(prev) {
-            return { current: prev.current - 1, served: prev.served + 1, batches: prev.batches, lastBatchTime: prev.lastBatchTime, date: getToday() };
-          });
+        setBatch(function(prev) {
+          return { current: prev.current > 0 ? prev.current - 1 : 0, served: prev.served + 1, batches: prev.batches, lastBatchTime: prev.lastBatchTime };
+        });
         setPinInput("");
         if (inputRef.current)
           inputRef.current.focus();
@@ -478,10 +460,9 @@ function OperatorView(p) {
     } else {
       setLoading(false);
       setFeedback({ t: "success", m: "Demo \u2014 entrega simulada", nome: "Aluno Demo" });
-      if (batch.current > 0)
-        setBatch(function(prev) {
-          return { current: prev.current - 1, served: prev.served + 1, batches: prev.batches, lastBatchTime: prev.lastBatchTime, date: getToday() };
-        });
+      setBatch(function(prev) {
+        return { current: prev.current > 0 ? prev.current - 1 : 0, served: prev.served + 1, batches: prev.batches, lastBatchTime: prev.lastBatchTime };
+      });
       setPinInput("");
       if (inputRef.current)
         inputRef.current.focus();
@@ -496,16 +477,38 @@ function OperatorView(p) {
     var n = parseInt(q);
     if (isNaN(n) || n <= 0)
       return;
-    setBatch(function(prev) {
-      return { current: prev.current + n, served: prev.served, batches: prev.batches + 1, lastBatchTime: getNow(), date: getToday() };
-    });
+    if (isApiConfigured()) {
+      setRefreshing(true);
+      apiPost({ action: "addFornada", qtd: n }).then(function(r) {
+        if (r.sucesso)
+          setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
+        setRefreshing(false);
+      }).catch(function() {
+        setRefreshing(false);
+      });
+    } else {
+      setBatch(function(prev) {
+        return { current: prev.current + n, served: prev.served, batches: prev.batches + 1, lastBatchTime: getNow() };
+      });
+    }
   }
   function resetBatch() {
     if (!window.confirm("Resetar o estoque atual? O total de p\xE3es servidos hoje ser\xE1 mantido. Use isto se errou o n\xFAmero da fornada."))
       return;
-    setBatch(function(prev) {
-      return { current: 0, served: prev.served, batches: prev.batches, lastBatchTime: prev.lastBatchTime, date: getToday() };
-    });
+    if (isApiConfigured()) {
+      setRefreshing(true);
+      apiPost({ action: "resetFornada" }).then(function(r) {
+        if (r.sucesso)
+          setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
+        setRefreshing(false);
+      }).catch(function() {
+        setRefreshing(false);
+      });
+    } else {
+      setBatch(function(prev) {
+        return { current: 0, served: prev.served, batches: prev.batches, lastBatchTime: prev.lastBatchTime };
+      });
+    }
   }
   function handleAdminCheckin() {
     var r = adminRa.trim();
@@ -644,7 +647,7 @@ function StatusView(p) {
   var isPickupDay = p.pickupActive;
   var pickupTime = p.pickupTime;
   var onBack = p.onBack;
-  var statusS = useState({ ci: 0, pk: 0 });
+  var statusS = useState({ ci: 0, pk: 0, estoque: 0 });
   var status = statusS[0];
   var setStatus = statusS[1];
   var clkS = useState(getNow());
@@ -666,7 +669,7 @@ function StatusView(p) {
       if (isApiConfigured()) {
         apiGet("statusDia").then(function(r) {
           if (r.sucesso)
-            setStatus({ ci: r.checkins, pk: r.retiradas });
+            setStatus({ ci: r.checkins, pk: r.retiradas, estoque: r.estoque != null ? r.estoque : 0 });
         }).catch(function() {
         });
       }
@@ -742,7 +745,7 @@ function StatusView(p) {
     img.src = qrImgUrl;
   }
   var live = isPickupDay && dentroDoHorario(pickupTime);
-  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Tela da Copa", badge: isPickupDay ? "Distribui\xE7\xE3o" : "Presen\xE7a", bt: isPickupDay ? "success" : "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 18, maxWidth: 460, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 16, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 56, mb: 12 }), /* @__PURE__ */ React.createElement(PageTitle, { showPdq: live, mb: 0 })), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 18, padding: "20px", border: "1px solid " + C.g200, textAlign: "center", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: C.nv, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: FD } }, "QR Code do dia"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: C.or, marginTop: 3, marginBottom: 14, fontFamily: FB } }, dataExtenso), qrImgUrl ? /* @__PURE__ */ React.createElement("div", { style: { display: "inline-block", padding: 14, borderRadius: 14, background: C.wh, border: "2px solid " + C.nv } }, /* @__PURE__ */ React.createElement("img", { src: qrImgUrl, alt: "QR Code", style: { width: 210, height: 210, display: "block" } })) : /* @__PURE__ */ React.createElement("div", { style: { width: 238, height: 238, borderRadius: 14, background: C.g50, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", border: "2px dashed " + C.g200 } }, /* @__PURE__ */ React.createElement(Spinner, { size: 28 })), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } }, /* @__PURE__ */ React.createElement(Icon, { name: "phone", size: 14, color: C.mu }), " Escaneie com a c\xE2mera do celular"), /* @__PURE__ */ React.createElement("button", { onClick: downloadQR, style: { marginTop: 14, width: "100%", padding: "12px", borderRadius: 11, border: "1px solid " + C.g200, background: C.g50, color: C.nv, fontFamily: FD, fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase" } }, /* @__PURE__ */ React.createElement(Icon, { name: "download", size: 16, color: C.nv }), " Baixar para impress\xE3o")), isPickupDay ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.nv, borderRadius: 16, padding: "18px 14px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, fontWeight: 900, fontFamily: FD, color: batch.current > 0 ? C.orL : "rgba(255,255,255,0.4)", lineHeight: 1 } }, batch.current), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 5, fontFamily: FB } }, batch.current > 0 ? "dispon\xEDveis" : "aguarde fornada")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.wh, borderRadius: 16, padding: "18px 14px", textAlign: "center", border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, fontWeight: 900, fontFamily: FD, color: C.ok, lineHeight: 1 } }, status.pk), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, marginTop: 5, fontFamily: FB } }, "retiradas hoje"))) : /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "18px", textAlign: "center", border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, fontWeight: 900, fontFamily: FD, color: C.nv, lineHeight: 1 } }, status.ci), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginTop: 5, fontFamily: FB } }, "acessos registrados hoje")), live && /* @__PURE__ */ React.createElement("div", { style: { background: batch.current > 0 ? C.okB : C.wnB, borderRadius: 12, padding: "13px", textAlign: "center", border: "1px solid " + (batch.current > 0 ? C.okD : C.wnD), marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, batch.current > 0 && /* @__PURE__ */ React.createElement("span", { style: { width: 8, height: 8, borderRadius: "50%", background: C.ok, animation: "pulse 1.5s ease-in-out infinite" } }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, fontWeight: 700, color: batch.current > 0 ? C.ok : C.wn, textTransform: "uppercase", fontFamily: FD } }, batch.current > 0 ? "Servindo agora" : "Pr\xF3xima fornada em preparo")), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", fontSize: 13, color: C.di, fontFamily: FM, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } }, /* @__PURE__ */ React.createElement(Icon, { name: "clock", size: 14, color: C.di }), " ", clock)));
+  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Tela da Copa", badge: isPickupDay ? "Distribui\xE7\xE3o" : "Presen\xE7a", bt: isPickupDay ? "success" : "neutral" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 18, maxWidth: 460, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 16, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 56, mb: 12 }), /* @__PURE__ */ React.createElement(PageTitle, { showPdq: live, mb: 0 })), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 18, padding: "20px", border: "1px solid " + C.g200, textAlign: "center", marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: C.nv, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: FD } }, "QR Code do dia"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: C.or, marginTop: 3, marginBottom: 14, fontFamily: FB } }, dataExtenso), qrImgUrl ? /* @__PURE__ */ React.createElement("div", { style: { display: "inline-block", padding: 14, borderRadius: 14, background: C.wh, border: "2px solid " + C.nv } }, /* @__PURE__ */ React.createElement("img", { src: qrImgUrl, alt: "QR Code", style: { width: 210, height: 210, display: "block" } })) : /* @__PURE__ */ React.createElement("div", { style: { width: 238, height: 238, borderRadius: 14, background: C.g50, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", border: "2px dashed " + C.g200 } }, /* @__PURE__ */ React.createElement(Spinner, { size: 28 })), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } }, /* @__PURE__ */ React.createElement(Icon, { name: "phone", size: 14, color: C.mu }), " Escaneie com a c\xE2mera do celular"), /* @__PURE__ */ React.createElement("button", { onClick: downloadQR, style: { marginTop: 14, width: "100%", padding: "12px", borderRadius: 11, border: "1px solid " + C.g200, background: C.g50, color: C.nv, fontFamily: FD, fontSize: 14, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase" } }, /* @__PURE__ */ React.createElement(Icon, { name: "download", size: 16, color: C.nv }), " Baixar para impress\xE3o")), isPickupDay ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.nv, borderRadius: 16, padding: "18px 14px", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, fontWeight: 900, fontFamily: FD, color: status.estoque > 0 ? C.orL : "rgba(255,255,255,0.4)", lineHeight: 1 } }, status.estoque), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 5, fontFamily: FB } }, status.estoque > 0 ? "dispon\xEDveis" : "aguarde fornada")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.wh, borderRadius: 16, padding: "18px 14px", textAlign: "center", border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, fontWeight: 900, fontFamily: FD, color: C.ok, lineHeight: 1 } }, status.pk), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, marginTop: 5, fontFamily: FB } }, "retiradas hoje"))) : /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "18px", textAlign: "center", border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, fontWeight: 900, fontFamily: FD, color: C.nv, lineHeight: 1 } }, status.ci), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginTop: 5, fontFamily: FB } }, "acessos registrados hoje")), live && /* @__PURE__ */ React.createElement("div", { style: { background: status.estoque > 0 ? C.okB : C.wnB, borderRadius: 12, padding: "13px", textAlign: "center", border: "1px solid " + (status.estoque > 0 ? C.okD : C.wnD), marginBottom: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, status.estoque > 0 && /* @__PURE__ */ React.createElement("span", { style: { width: 8, height: 8, borderRadius: "50%", background: C.ok, animation: "pulse 1.5s ease-in-out infinite" } }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, fontWeight: 700, color: status.estoque > 0 ? C.ok : C.wn, textTransform: "uppercase", fontFamily: FD } }, status.estoque > 0 ? "Servindo agora" : "Pr\xF3xima fornada em preparo")), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", fontSize: 13, color: C.di, fontFamily: FM, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 } }, /* @__PURE__ */ React.createElement(Icon, { name: "clock", size: 14, color: C.di }), " ", clock)));
 }
 var ADMIN_CODE = "Famu#83";
 function AdminPanel(p) {
@@ -823,16 +826,9 @@ function App() {
   var tmS = useState({});
   var terms = tmS[0];
   var setTerms = tmS[1];
-  var btS = useState(loadBatch());
+  var btS = useState({ current: 0, served: 0, batches: 0, lastBatchTime: "" });
   var batch = btS[0];
-  var setBatchRaw = btS[1];
-  function setBatch(updater) {
-    setBatchRaw(function(prev) {
-      var next = typeof updater === "function" ? updater(prev) : updater;
-      saveBatch(next);
-      return next;
-    });
-  }
+  var setBatch = btS[1];
   var adS = useState({ 1: true, 2: true, 3: true, 4: true, 5: true });
   var activeDays = adS[0];
   var setActiveDays = adS[1];
