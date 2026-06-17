@@ -415,8 +415,11 @@ function OperatorView(p) {
       return;
     setRefreshing(true);
     apiGet("statusDia").then(function(r) {
-      if (r.sucesso)
+      if (r.sucesso) {
         setCounts({ ci: r.checkins, pk: r.retiradas });
+        if (r.ultimas && r.ultimas.length >= 0)
+          setRecents(r.ultimas);
+      }
       setRefreshing(false);
     }).catch(function() {
       setRefreshing(false);
@@ -452,7 +455,7 @@ function OperatorView(p) {
         }
         setFeedback({ t: "success", m: r.mensagem, nome: r.nome });
         setRecents(function(prev) {
-          return [{ nome: r.nome, turma: r.turma, time: r.horaRetirada }].concat(prev).slice(0, 12);
+          return [{ nome: r.nome, turma: r.turma, time: r.horaRetirada }].concat(prev).slice(0, 5);
         });
         setCounts(function(prev) {
           return { ci: prev.ci, pk: prev.pk + 1 };
@@ -590,7 +593,7 @@ function ConfigView(p) {
         if (nd[k])
           dias.push(mapa[parseInt(k)]);
       });
-      apiPost({ action: "salvarDiasAtivos", dias }).catch(function() {
+      apiPost({ action: "salvarDiasAtivos", dias, adminPin: ADMIN_CODE }).catch(function() {
       });
     }
   }
