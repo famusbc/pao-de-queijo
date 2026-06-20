@@ -784,6 +784,8 @@ var RITMO_KEY = "famu_ritmo_v1";
 var ASSAR_MIN = 20;
 var DEFASAGEM_MIN = 10;
 var PREHEAT_MIN = 15;
+var MONTAGEM_MIN = 5;
+var MANUSEIO_MIN = 3;
 function horaParaMin(str) {
   var m = (str || "").toString().match(/(\d{1,2})[:hH](\d{2})/);
   if (!m)
@@ -794,28 +796,46 @@ function minParaHora(min) {
   min = Math.round((min % 1440 + 1440) % 1440);
   return ("0" + Math.floor(min / 60)).slice(-2) + ":" + ("0" + min % 60).slice(-2);
 }
-function calcularLinhaTempo(metaServirStr, fornadasPorForno) {
+function calcularLinhaTempo(metaServirStr, fornadasPorForno, comRevezamento) {
   var metaMin = horaParaMin(metaServirStr);
   if (metaMin == null)
     return [];
   var n = fornadasPorForno || 2;
   var entradaA1 = metaMin - ASSAR_MIN;
-  var startMin = entradaA1 - PREHEAT_MIN;
+  var preheatStart = entradaA1 - PREHEAT_MIN;
   var ev = [];
-  ev.push({ min: startMin, tipo: "preheat", txt: "Ligar o pr\xE9-aquecimento dos dois fornos a 180\xB0C e montar a primeira bandeja." });
+  ev.push({ min: preheatStart, tipo: "preheat", txt: "Ligar o pr\xE9-aquecimento dos dois fornos (180\xB0C) e montar as bandejas A1 e B1." });
   ["A", "B"].forEach(function(forno) {
     var offset = forno === "A" ? 0 : DEFASAGEM_MIN;
+    var passo = ASSAR_MIN + MANUSEIO_MIN;
     for (var k = 0; k < n; k++) {
-      var enterT = entradaA1 + offset + k * ASSAR_MIN;
+      var enterT = entradaA1 + offset + k * passo;
       var exitT = enterT + ASSAR_MIN;
-      ev.push({ min: enterT, tipo: "enter", forno, txt: "Forno " + forno + ": entra a fornada " + (k + 1) });
+      if (k >= 1) {
+        var montagemFim = enterT - MANUSEIO_MIN;
+        var montagemIni = montagemFim - MONTAGEM_MIN;
+        ev.push({ min: montagemIni, tipo: "montagem", forno, txt: "Montar a bandeja da fornada " + (k + 1) + " do Forno " + forno + " \u2014 deixar pronta para a troca." });
+      }
+      ev.push({ min: enterT, tipo: "enter", forno, txt: "Forno " + forno + ": colocar a fornada " + (k + 1) + " (j\xE1 montada)." });
       ev.push({ min: exitT, tipo: "serve", forno, txt: "Forno " + forno + ": sai a fornada " + (k + 1) + " \u2014 servir!" });
     }
   });
+  if (comRevezamento) {
+    var serves = ev.filter(function(e) {
+      return e.tipo === "serve";
+    }).map(function(e) {
+      return e.min;
+    }).sort(function(a, b) {
+      return a - b;
+    });
+    for (var s = 0; s < serves.length - 1; s++) {
+      ev.push({ min: serves[s], tipo: "revezar", txt: "Janela para revezar: trocar quem fica na cozinha e quem fica no atendimento." });
+    }
+  }
   ev.sort(function(a, b) {
     if (a.min !== b.min)
       return a.min - b.min;
-    var ordem = { preheat: 0, serve: 1, enter: 2 };
+    var ordem = { preheat: 0, montagem: 1, serve: 2, revezar: 3, enter: 4 };
     return ordem[a.tipo] - ordem[b.tipo];
   });
   return ev;
@@ -846,7 +866,7 @@ function novoRitmo() {
       A: { estado: "idle", inicio: null, fornadas: 0 },
       B: { estado: "idle", inicio: null, fornadas: 0 }
     },
-    plano: { inicio: "", fornadasPorForno: 2 }
+    plano: { inicio: "", fornadasPorForno: 2, revezamento: true }
   };
 }
 function RitmoView(p) {
@@ -865,7 +885,7 @@ function RitmoView(p) {
   var setTick = tickS[1];
   var audioRef = useRef(null);
   var alertedRef = useRef({});
-  var plano = st.plano || { inicio: "", fornadasPorForno: 2 };
+  var plano = st.plano || { inicio: "", fornadasPorForno: 2, revezamento: true };
   var inicioSugerido = function() {
     var hm = (pickupTime || "").match(/(\d{1,2})[:hH](\d{2})/);
     return hm ? ("0" + hm[1]).slice(-2) + ":" + hm[2] : "18:00";
@@ -895,10 +915,17 @@ function RitmoView(p) {
   function setPlanoFornadas(delta) {
     var next = JSON.parse(JSON.stringify(st));
     if (!next.plano)
-      next.plano = { inicio: "", fornadasPorForno: 2 };
+      next.plano = { inicio: "", fornadasPorForno: 2, revezamento: true };
     var atual = next.plano.fornadasPorForno || 2;
     var novo = Math.max(1, Math.min(4, atual + delta));
     next.plano.fornadasPorForno = novo;
+    persist(next);
+  }
+  function setPlanoRevezamento(valor) {
+    var next = JSON.parse(JSON.stringify(st));
+    if (!next.plano)
+      next.plano = { inicio: "", fornadasPorForno: 2, revezamento: true };
+    next.plano.revezamento = valor;
     persist(next);
   }
   function beep() {
@@ -1040,7 +1067,7 @@ function RitmoView(p) {
     return { width: "100%", padding: "11px", borderRadius: 11, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontFamily: FD, fontWeight: 600, fontSize: 13, cursor: "pointer", textTransform: "uppercase" };
   }
   var totalFornadas = fA.fornadas + fB.fornadas;
-  var linha = calcularLinhaTempo(inicioPlano, plano.fornadasPorForno);
+  var linha = calcularLinhaTempo(inicioPlano, plano.fornadasPorForno, plano.revezamento !== false);
   var nowMin = (/* @__PURE__ */ new Date()).getHours() * 60 + (/* @__PURE__ */ new Date()).getMinutes();
   var proxIdx = -1;
   for (var li = 0; li < linha.length; li++) {
@@ -1050,10 +1077,10 @@ function RitmoView(p) {
     }
   }
   function corEtapa(tipo) {
-    return tipo === "serve" ? C.ok : tipo === "preheat" ? C.wn : C.or;
+    return tipo === "serve" ? C.ok : tipo === "preheat" ? C.wn : tipo === "montagem" ? C.nv : tipo === "revezar" ? C.nvL : C.or;
   }
   function iconeEtapa(tipo) {
-    return tipo === "serve" ? "check" : tipo === "preheat" ? "flame" : "play";
+    return tipo === "serve" ? "check" : tipo === "preheat" ? "flame" : tipo === "montagem" ? "bread" : tipo === "revezar" ? "refresh" : "play";
   }
   return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Ritmo de Fornadas", badge: "Guia", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 16, maxWidth: 560, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, padding: 5, background: C.g100, borderRadius: 13, marginBottom: 14 } }, [{ id: "plano", t: "Planejamento", ic: "timer" }, { id: "vivo", t: "Ao vivo", ic: "flame" }].map(function(tab) {
     var on = mode === tab.id;
@@ -1074,7 +1101,9 @@ function RitmoView(p) {
     setPlanoFornadas(-1);
   }, style: { width: 34, height: 34, borderRadius: 9, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1 } }, "\u2212"), /* @__PURE__ */ React.createElement("span", { style: { width: 28, textAlign: "center", fontFamily: FD, fontWeight: 800, fontSize: 20, color: C.nv } }, plano.fornadasPorForno || 2), /* @__PURE__ */ React.createElement("button", { onClick: function() {
     setPlanoFornadas(1);
-  }, style: { width: 34, height: 34, borderRadius: 9, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1 } }, "+")))), linha.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "12px 14px", borderRadius: 11, background: C.orS, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 11 } }, /* @__PURE__ */ React.createElement(Icon, { name: "flame", size: 20, color: C.or, style: { flexShrink: 0 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.g700, lineHeight: 1.4 } }, "Para isso, ligue o pr\xE9-aquecimento \xE0s ", /* @__PURE__ */ React.createElement("b", { style: { color: C.or, fontFamily: FM } }, minParaHora(linha[0].min)), " e monte a primeira bandeja.")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 11, color: C.di, fontFamily: FB, lineHeight: 1.5 } }, "Base do c\xE1lculo: pr\xE9-aquecimento ", PREHEAT_MIN, " min \xB7 fornada ", ASSAR_MIN, " min \xB7 defasagem entre fornos ", DEFASAGEM_MIN, " min \xB7 ", (plano.fornadasPorForno || 2) * 2, " fornadas no total.")), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "18px 18px 8px", border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 4 } }, "Linha do tempo"), linha.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginBottom: 16 } }, "Primeiro p\xE3o \xE0s ", /* @__PURE__ */ React.createElement("b", { style: { color: C.ok } }, minParaHora(linha.filter(function(e) {
+  }, style: { width: 34, height: 34, borderRadius: 9, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1 } }, "+")))), linha.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "12px 14px", borderRadius: 11, background: C.orS, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 11 } }, /* @__PURE__ */ React.createElement(Icon, { name: "flame", size: 20, color: C.or, style: { flexShrink: 0 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.g700, lineHeight: 1.4 } }, "Para isso, ligue o pr\xE9-aquecimento \xE0s ", /* @__PURE__ */ React.createElement("b", { style: { color: C.or, fontFamily: FM } }, minParaHora(linha[0].min)), " e monte a primeira bandeja.")), /* @__PURE__ */ React.createElement("button", { onClick: function() {
+    setPlanoRevezamento(plano.revezamento === false);
+  }, style: { width: "100%", marginTop: 12, padding: "12px 14px", borderRadius: 11, border: "1px solid " + C.g200, background: C.g50, display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", textAlign: "left" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(Icon, { name: "refresh", size: 18, color: C.nvL }), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: C.nv, fontFamily: FD, textTransform: "uppercase" } }, "Opera\xE7\xE3o com 2 pessoas"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu } }, "Mostra os pap\xE9is e os pontos de revezamento"))), /* @__PURE__ */ React.createElement("div", { style: { width: 44, height: 24, borderRadius: 12, padding: 2, background: plano.revezamento !== false ? C.ok : C.g300, display: "flex", alignItems: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 20, height: 20, borderRadius: 10, background: C.wh, transition: "transform 0.2s", transform: plano.revezamento !== false ? "translateX(20px)" : "translateX(0)", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" } }))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 11, color: C.di, fontFamily: FB, lineHeight: 1.5 } }, "Base do c\xE1lculo: pr\xE9-aquecimento ", PREHEAT_MIN, " min \xB7 montagem da bandeja ", MONTAGEM_MIN, " min \xB7 forno ", ASSAR_MIN, " min \xB7 troca (tirar + recolocar) ", MANUSEIO_MIN, " min \xB7 defasagem ", DEFASAGEM_MIN, " min \xB7 ", (plano.fornadasPorForno || 2) * 2, " fornadas no total.")), plano.revezamento !== false && /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 18, border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 9, marginBottom: 12 } }, /* @__PURE__ */ React.createElement(Icon, { name: "refresh", size: 20, color: C.nvL }), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv } }, "Revezamento entre 2 pessoas")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.orS, borderRadius: 12, padding: "12px 13px", border: "1px solid " + C.orB } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "oven", size: 16, color: C.or }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 700, fontFamily: FD, color: C.or, textTransform: "uppercase" } }, "Cozinha")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.45 } }, "Montar bandejas, colocar e tirar do forno. Trabalho quente, com luva.")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.okB, borderRadius: 12, padding: "12px 13px", border: "1px solid " + C.okD } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "key", size: 16, color: C.ok }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 700, fontFamily: FD, color: C.ok, textTransform: "uppercase" } }, "Atendimento")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.45 } }, "Validar o c\xF3digo do aluno e entregar o p\xE3o. Trabalho leve, com o celular."))), /* @__PURE__ */ React.createElement("div", { style: { background: C.wnB, borderRadius: 10, padding: "10px 13px", border: "1px solid " + C.wnD, display: "flex", alignItems: "flex-start", gap: 9 } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 16, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.45 } }, /* @__PURE__ */ React.createElement("b", null, "Regra de higiene:"), " a cada momento, uma pessoa em cada fun\xE7\xE3o. Quem est\xE1 com as m\xE3os na comida n\xE3o mexe no celular. Para descansar do calor do forno, troquem de fun\xE7\xE3o nas janelas marcadas na linha do tempo."))), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "18px 18px 8px", border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 4 } }, "Linha do tempo"), linha.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginBottom: 16 } }, "Primeiro p\xE3o \xE0s ", /* @__PURE__ */ React.createElement("b", { style: { color: C.ok } }, minParaHora(linha.filter(function(e) {
     return e.tipo === "serve";
   })[0].min)), " \xB7 \xFAltimo por volta de ", /* @__PURE__ */ React.createElement("b", { style: { color: C.or } }, minParaHora(linha[linha.length - 1].min))), /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 47, top: 6, bottom: 16, width: 2, background: C.g200 } }), linha.map(function(e, i) {
     var passou = e.min <= nowMin;
