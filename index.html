@@ -783,6 +783,41 @@ function StatusView(p) {
 var RITMO_KEY = "famu_ritmo_v1";
 var ASSAR_MIN = 20;
 var DEFASAGEM_MIN = 10;
+var PREHEAT_MIN = 15;
+function horaParaMin(str) {
+  var m = (str || "").toString().match(/(\d{1,2})[:hH](\d{2})/);
+  if (!m)
+    return null;
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+}
+function minParaHora(min) {
+  min = Math.round((min % 1440 + 1440) % 1440);
+  return ("0" + Math.floor(min / 60)).slice(-2) + ":" + ("0" + min % 60).slice(-2);
+}
+function calcularLinhaTempo(inicioStr, fornadasPorForno) {
+  var startMin = horaParaMin(inicioStr);
+  if (startMin == null)
+    return [];
+  var n = fornadasPorForno || 2;
+  var ev = [];
+  ev.push({ min: startMin, tipo: "preheat", txt: "Pr\xE9-aquecer os dois fornos a 180\xB0C e montar a primeira bandeja." });
+  ["A", "B"].forEach(function(forno) {
+    var offset = forno === "A" ? 0 : DEFASAGEM_MIN;
+    for (var k = 0; k < n; k++) {
+      var enterT = startMin + PREHEAT_MIN + offset + k * ASSAR_MIN;
+      var exitT = enterT + ASSAR_MIN;
+      ev.push({ min: enterT, tipo: "enter", forno, txt: "Forno " + forno + ": entra a fornada " + (k + 1) });
+      ev.push({ min: exitT, tipo: "serve", forno, txt: "Forno " + forno + ": sai a fornada " + (k + 1) + " \u2014 servir!" });
+    }
+  });
+  ev.sort(function(a, b) {
+    if (a.min !== b.min)
+      return a.min - b.min;
+    var ordem = { preheat: 0, serve: 1, enter: 2 };
+    return ordem[a.tipo] - ordem[b.tipo];
+  });
+  return ev;
+}
 function loadRitmo() {
   try {
     var raw = window.localStorage.getItem(RITMO_KEY);
@@ -808,21 +843,32 @@ function novoRitmo() {
     fornos: {
       A: { estado: "idle", inicio: null, fornadas: 0 },
       B: { estado: "idle", inicio: null, fornadas: 0 }
-    }
+    },
+    plano: { inicio: "", fornadasPorForno: 2 }
   };
 }
 function RitmoView(p) {
   var onBack = p.onBack;
   var onServir = p.onServir;
+  var pickupTime = p.pickupTime;
   var stS = useState(function() {
     return loadRitmo() || novoRitmo();
   });
   var st = stS[0];
   var setSt = stS[1];
+  var modeS = useState("plano");
+  var mode = modeS[0];
+  var setMode = modeS[1];
   var tickS = useState(0);
   var setTick = tickS[1];
   var audioRef = useRef(null);
   var alertedRef = useRef({});
+  var plano = st.plano || { inicio: "", fornadasPorForno: 2 };
+  var inicioSugerido = function() {
+    var hm = (pickupTime || "").match(/(\d{1,2})[:hH](\d{2})/);
+    return hm ? ("0" + hm[1]).slice(-2) + ":" + hm[2] : "18:00";
+  }();
+  var inicioPlano = plano.inicio || inicioSugerido;
   useEffect(function() {
     var t = setInterval(function() {
       setTick(function(x) {
@@ -836,6 +882,22 @@ function RitmoView(p) {
   function persist(next) {
     saveRitmo(next);
     setSt(next);
+  }
+  function setPlanoInicio(valor) {
+    var next = JSON.parse(JSON.stringify(st));
+    if (!next.plano)
+      next.plano = { inicio: "", fornadasPorForno: 2 };
+    next.plano.inicio = valor;
+    persist(next);
+  }
+  function setPlanoFornadas(delta) {
+    var next = JSON.parse(JSON.stringify(st));
+    if (!next.plano)
+      next.plano = { inicio: "", fornadasPorForno: 2 };
+    var atual = next.plano.fornadasPorForno || 2;
+    var novo = Math.max(1, Math.min(4, atual + delta));
+    next.plano.fornadasPorForno = novo;
+    persist(next);
   }
   function beep() {
     try {
@@ -976,7 +1038,48 @@ function RitmoView(p) {
     return { width: "100%", padding: "11px", borderRadius: 11, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontFamily: FD, fontWeight: 600, fontSize: 13, cursor: "pointer", textTransform: "uppercase" };
   }
   var totalFornadas = fA.fornadas + fB.fornadas;
-  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Ritmo de Fornadas", badge: "Guia", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 16, maxWidth: 560, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { background: bannerColor, borderRadius: 16, padding: "16px 18px", marginBottom: 14, display: "flex", alignItems: "center", gap: 13, position: "relative", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: -12, top: -12, opacity: 0.12 } }, /* @__PURE__ */ React.createElement(Icon, { name: agora.tipo === "pronto" ? "check" : agora.tipo === "defasagem" ? "flame" : "timer", size: 80, color: C.wh })), /* @__PURE__ */ React.createElement("div", { style: { width: 42, height: 42, borderRadius: 11, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement(Icon, { name: agora.tipo === "pronto" ? "check" : agora.tipo === "defasagem" ? "flame" : agora.tipo === "inicio" ? "oven" : "timer", size: 24, color: C.wh, stroke: 2.2 })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: FB } }, "Agora"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: C.wh, fontFamily: FD, lineHeight: 1.15, marginTop: 2 } }, agora.msg))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement(StatTile, { label: "Fornadas hoje", value: totalFornadas, sub: "de ~4 previstas", icon: "oven", accent: true }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.wh, borderRadius: 14, padding: "14px 16px", border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, fontFamily: FB, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 } }, "Ciclo sugerido"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.tx, fontFamily: FB, lineHeight: 1.4 } }, "Fornada ~", ASSAR_MIN, " min \xB7 defasar fornos em ", DEFASAGEM_MIN, " min"))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, marginBottom: 14, alignItems: "stretch" } }, FornoCard("A"), FornoCard("B")), /* @__PURE__ */ React.createElement("div", { style: { background: C.wnB, borderRadius: 12, padding: "12px 14px", border: "1px solid " + C.wnD, marginBottom: 14, display: "flex", alignItems: "flex-start", gap: 10 } }, /* @__PURE__ */ React.createElement(Icon, { name: "flame", size: 18, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.5 } }, /* @__PURE__ */ React.createElement("b", null, "Antes de come\xE7ar:"), " pr\xE9-aque\xE7a os dois fornos a 180\xB0C (~10-15 min) com as bandejas de p\xE3es congelados j\xE1 montadas. O guia \xE9 uma sugest\xE3o \u2014 ajuste o ritmo conforme a realidade da copa.")), /* @__PURE__ */ React.createElement("button", { onClick: resetRitmo, style: { width: "100%", padding: "11px", borderRadius: 11, border: "1px solid " + C.g200, background: C.wh, color: C.mu, fontFamily: FB, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 } }, /* @__PURE__ */ React.createElement(Icon, { name: "refresh", size: 15, color: C.mu }), " Reiniciar guia"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 14, fontSize: 11, color: C.di, lineHeight: 1.5 } }, "Cada \u201CTirar e servir\u201D registra a fornada no estoque automaticamente.")));
+  var linha = calcularLinhaTempo(inicioPlano, plano.fornadasPorForno);
+  var nowMin = (/* @__PURE__ */ new Date()).getHours() * 60 + (/* @__PURE__ */ new Date()).getMinutes();
+  var proxIdx = -1;
+  for (var li = 0; li < linha.length; li++) {
+    if (linha[li].min > nowMin) {
+      proxIdx = li;
+      break;
+    }
+  }
+  function corEtapa(tipo) {
+    return tipo === "serve" ? C.ok : tipo === "preheat" ? C.wn : C.or;
+  }
+  function iconeEtapa(tipo) {
+    return tipo === "serve" ? "check" : tipo === "preheat" ? "flame" : "play";
+  }
+  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Ritmo de Fornadas", badge: "Guia", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 16, maxWidth: 560, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, padding: 5, background: C.g100, borderRadius: 13, marginBottom: 14 } }, [{ id: "plano", t: "Planejamento", ic: "timer" }, { id: "vivo", t: "Ao vivo", ic: "flame" }].map(function(tab) {
+    var on = mode === tab.id;
+    return /* @__PURE__ */ React.createElement("button", { key: tab.id, onClick: function() {
+      setMode(tab.id);
+    }, style: { flex: 1, padding: "10px", borderRadius: 9, border: "none", cursor: "pointer", background: on ? C.wh : "transparent", color: on ? C.nv : C.mu, fontFamily: FD, fontWeight: 700, fontSize: 14, textTransform: "uppercase", letterSpacing: "0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: 7, boxShadow: on ? "0 1px 3px rgba(0,0,0,0.08)" : "none" } }, /* @__PURE__ */ React.createElement(Icon, { name: tab.ic, size: 16, color: on ? C.or : C.mu }), " ", tab.t);
+  })), mode === "plano" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 18, border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 4 } }, "Hor\xE1rio de in\xEDcio"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: C.mu, marginBottom: 14, lineHeight: 1.5 } }, "Informe a hora em que pretende ligar o pr\xE9-aquecimento. O app projeta toda a sequ\xEAncia."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "time",
+      value: inicioPlano,
+      onChange: function(e) {
+        setPlanoInicio(e.target.value);
+      },
+      style: { flex: "1 1 130px", padding: "13px 14px", borderRadius: 11, border: "2px solid " + C.g200, background: C.g50, color: C.nv, fontFamily: FM, fontSize: 22, fontWeight: 700, outline: "none", textAlign: "center", boxSizing: "border-box" }
+    }
+  ), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: C.mu, fontFamily: FB, fontWeight: 600 } }, "Fornadas por forno"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 4 } }, /* @__PURE__ */ React.createElement("button", { onClick: function() {
+    setPlanoFornadas(-1);
+  }, style: { width: 34, height: 34, borderRadius: 9, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1 } }, "\u2212"), /* @__PURE__ */ React.createElement("span", { style: { width: 28, textAlign: "center", fontFamily: FD, fontWeight: 800, fontSize: 20, color: C.nv } }, plano.fornadasPorForno || 2), /* @__PURE__ */ React.createElement("button", { onClick: function() {
+    setPlanoFornadas(1);
+  }, style: { width: 34, height: 34, borderRadius: 9, border: "1px solid " + C.g200, background: C.wh, color: C.nv, fontSize: 20, fontWeight: 700, cursor: "pointer", lineHeight: 1 } }, "+")))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 11, color: C.di, fontFamily: FB, lineHeight: 1.5 } }, "Base do c\xE1lculo: pr\xE9-aquecimento ", PREHEAT_MIN, " min \xB7 fornada ", ASSAR_MIN, " min \xB7 defasagem entre fornos ", DEFASAGEM_MIN, " min \xB7 ", (plano.fornadasPorForno || 2) * 2, " fornadas no total.")), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "18px 18px 8px", border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 4 } }, "Linha do tempo"), linha.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, marginBottom: 16 } }, "Primeiro p\xE3o por volta de ", /* @__PURE__ */ React.createElement("b", { style: { color: C.ok } }, minParaHora(linha.filter(function(e) {
+    return e.tipo === "serve";
+  })[0].min)), " \xB7 \xFAltimo por volta de ", /* @__PURE__ */ React.createElement("b", { style: { color: C.or } }, minParaHora(linha[linha.length - 1].min))), /* @__PURE__ */ React.createElement("div", { style: { position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 47, top: 6, bottom: 16, width: 2, background: C.g200 } }), linha.map(function(e, i) {
+    var passou = e.min <= nowMin;
+    var ehProxima = i === proxIdx;
+    var cor = corEtapa(e.tipo);
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 16, opacity: passou ? 0.45 : 1, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 38, textAlign: "right", fontFamily: FM, fontSize: 14, fontWeight: 700, color: passou ? C.di : C.nv, flexShrink: 0, paddingTop: 6 } }, minParaHora(e.min)), /* @__PURE__ */ React.createElement("div", { style: { flexShrink: 0, width: 20, display: "flex", justifyContent: "center", paddingTop: 4, position: "relative", zIndex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 20, height: 20, borderRadius: "50%", background: passou ? C.g300 : cor, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: ehProxima ? "0 0 0 4px " + (e.tipo === "serve" ? C.okB : C.orS) : "none" } }, /* @__PURE__ */ React.createElement(Icon, { name: iconeEtapa(e.tipo), size: 11, color: C.wh, stroke: 2.6 }))), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, paddingTop: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 14, fontWeight: ehProxima ? 700 : 600, color: passou ? C.mu : e.tipo === "serve" ? C.ok : C.tx, lineHeight: 1.35 } }, e.txt), ehProxima && /* @__PURE__ */ React.createElement("span", { style: { display: "inline-block", marginTop: 4, padding: "2px 9px", borderRadius: 20, background: C.orS, color: C.or, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em" } }, "Pr\xF3xima etapa")));
+  }))), /* @__PURE__ */ React.createElement("div", { style: { background: C.wnB, borderRadius: 12, padding: "12px 14px", border: "1px solid " + C.wnD, display: "flex", alignItems: "flex-start", gap: 10 } }, /* @__PURE__ */ React.createElement(Icon, { name: "timer", size: 18, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.5 } }, "Esta \xE9 uma previs\xE3o. Os hor\xE1rios se ajustam \xE0 realidade \u2014 use a aba ", /* @__PURE__ */ React.createElement("b", null, "Ao vivo"), " durante a opera\xE7\xE3o para acompanhar cada forno e registrar as fornadas."))), mode === "vivo" && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: bannerColor, borderRadius: 16, padding: "16px 18px", marginBottom: 14, display: "flex", alignItems: "center", gap: 13, position: "relative", overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: -12, top: -12, opacity: 0.12 } }, /* @__PURE__ */ React.createElement(Icon, { name: agora.tipo === "pronto" ? "check" : agora.tipo === "defasagem" ? "flame" : "timer", size: 80, color: C.wh })), /* @__PURE__ */ React.createElement("div", { style: { width: 42, height: 42, borderRadius: 11, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement(Icon, { name: agora.tipo === "pronto" ? "check" : agora.tipo === "defasagem" ? "flame" : agora.tipo === "inicio" ? "oven" : "timer", size: 24, color: C.wh, stroke: 2.2 })), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: FB } }, "Agora"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: C.wh, fontFamily: FD, lineHeight: 1.15, marginTop: 2 } }, agora.msg))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } }, /* @__PURE__ */ React.createElement(StatTile, { label: "Fornadas hoje", value: totalFornadas, sub: "de ~4 previstas", icon: "oven", accent: true }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, background: C.wh, borderRadius: 14, padding: "14px 16px", border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, fontFamily: FB, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 } }, "Ciclo sugerido"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.tx, fontFamily: FB, lineHeight: 1.4 } }, "Fornada ~", ASSAR_MIN, " min \xB7 defasar fornos em ", DEFASAGEM_MIN, " min"))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, marginBottom: 14, alignItems: "stretch" } }, FornoCard("A"), FornoCard("B")), /* @__PURE__ */ React.createElement("div", { style: { background: C.wnB, borderRadius: 12, padding: "12px 14px", border: "1px solid " + C.wnD, marginBottom: 14, display: "flex", alignItems: "flex-start", gap: 10 } }, /* @__PURE__ */ React.createElement(Icon, { name: "flame", size: 18, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.5 } }, /* @__PURE__ */ React.createElement("b", null, "Antes de come\xE7ar:"), " pr\xE9-aque\xE7a os dois fornos a 180\xB0C (~10-15 min) com as bandejas de p\xE3es congelados j\xE1 montadas. O guia \xE9 uma sugest\xE3o \u2014 ajuste o ritmo conforme a realidade da copa.")), /* @__PURE__ */ React.createElement("button", { onClick: resetRitmo, style: { width: "100%", padding: "11px", borderRadius: 11, border: "1px solid " + C.g200, background: C.wh, color: C.mu, fontFamily: FB, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 } }, /* @__PURE__ */ React.createElement(Icon, { name: "refresh", size: 15, color: C.mu }), " Reiniciar guia"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginTop: 14, fontSize: 11, color: C.di, lineHeight: 1.5 } }, "Cada \u201CTirar e servir\u201D registra a fornada no estoque automaticamente."))));
 }
 var ADMIN_CODE = "Famu#83";
 function AdminPanel(p) {
@@ -1129,7 +1232,7 @@ function App() {
   if (view === "operator")
     return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(OperatorView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack })));
   if (view === "ritmo")
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(RitmoView, { onBack: adminBack, onServir: servirFornada }));
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(RitmoView, { onBack: adminBack, onServir: servirFornada, pickupTime }));
   if (view === "dashboard")
     return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(DashView, __spreadProps(__spreadValues({}, sharedProps), { onBack: adminBack })));
   if (view === "status")
