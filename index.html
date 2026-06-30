@@ -253,6 +253,88 @@ function Ticket(p) {
 function LembreteBox() {
   return /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 14, padding: "16px 18px", border: "1px solid " + C.g200, textAlign: "left", marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: C.nv, marginBottom: 7, textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: FD } }, "Lembrete"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: C.tx, lineHeight: 1.6 } }, "Para garantir a continuidade do seu benef\xEDcio integral (bolsa de estudos), mantenha a frequ\xEAncia e a nota m\xEDnima exigidas em todas as disciplinas e cumpra as normas do Manual do Aluno."), /* @__PURE__ */ React.createElement("a", { href: "https://www.usjt.br/sou-estudante/manual-do-aluno/", target: "_blank", rel: "noopener noreferrer", style: { display: "inline-flex", alignItems: "center", gap: 7, marginTop: 12, padding: "8px 14px", borderRadius: 9, background: C.orS, border: "1px solid " + C.orB, color: C.or, fontSize: 12, fontWeight: 700, textDecoration: "none", fontFamily: FB } }, /* @__PURE__ */ React.createElement(Icon, { name: "download", size: 14, color: C.or }), " Manual do Aluno \u2014 USJT"));
 }
+function DOCS_RECEPCAO() { return [
+  { t: "Comprovante de renda", d: "Holerite, CTPS, RPA, Guia de Seguro-Desemprego ou extrato do CadÚnico." },
+  { t: "Anexo III — Declaração de Composição do Núcleo Familiar", d: "Documento do edital, preenchido e assinado pelo candidato." },
+  { t: "Comprovante de conclusão do Ensino Médio", d: "Histórico Escolar ou Declaração de Conclusão emitida pela escola." },
+  { t: "Anexo II — Declaração de Inexistência de Nível Superior", d: "Declaração de que não possui curso superior completo, assinada pelo candidato." },
+  { t: "Documentos pessoais", d: "RG, CPF, Título de Eleitor, Certidão de Nascimento ou Casamento e Comprovante de Residência." },
+]; }
+
+function RecepcaoCard(p) {
+  var resultado = p.resultado;
+  var abertoS = useState(true);
+  var aberto = abertoS[0];
+  var setAberto = abertoS[1];
+  var pin = resultado.pin;
+  var ce = React.createElement;
+  var notch = { position: "absolute", width: 18, height: 18, borderRadius: "50%", background: C.ow, top: "50%", marginTop: -9 };
+  return ce("div", { style: { animation: "ticketIn 0.5s cubic-bezier(0.2,0.8,0.3,1) both", marginTop: 18 } },
+    /* senha em destaque */
+    ce("div", { style: { filter: "drop-shadow(0 10px 24px rgba(27,42,74,0.16))" } },
+      ce("div", { style: { background: C.nv, borderRadius: "16px 16px 0 0", padding: "16px 22px 14px", textAlign: "center", position: "relative" } },
+        ce("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8 } },
+          ce("span", { style: { width: 18, height: 3, background: C.orL, borderRadius: 2 } }),
+          ce("span", { style: { fontSize: 10, color: "rgba(255,255,255,0.65)", fontFamily: FD, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase" } }, "Senha de Atendimento"),
+          ce("span", { style: { width: 18, height: 3, background: C.orL, borderRadius: 2 } })
+        ),
+        ce("div", { style: { fontSize: 17, fontWeight: 800, fontFamily: FD, color: C.wh, lineHeight: 1.1, textTransform: "uppercase" } }, resultado.nome),
+        ce("div", { style: { fontSize: 12, color: "rgba(255,255,255,0.6)", fontFamily: FM, marginTop: 3 } }, (resultado.curso || "") + (resultado.classificacao ? "  ·  " + resultado.classificacao + "\u00ba lugar" : ""))
+      ),
+      ce("div", { style: { position: "relative", height: 0 } }, ce("div", { style: Object.assign({}, notch, { left: -9 }) }), ce("div", { style: Object.assign({}, notch, { right: -9 }) })),
+      ce("div", { style: { background: C.wh, padding: "26px 22px 22px", borderLeft: "2px dashed " + C.g200, borderRight: "2px dashed " + C.g200, textAlign: "center", position: "relative" } },
+        ce("div", { style: { position: "absolute", left: 12, right: 12, top: 0, borderTop: "2px dashed " + C.g200 } }),
+        ce("div", { style: { fontSize: 10, color: C.mu, fontFamily: FB, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 10 } }, "Sua senha"),
+        ce("div", { style: { display: "flex", justifyContent: "center", gap: 8 } },
+          pin.split("").map(function (d, i) {
+            return ce("span", { key: i, style: { width: 48, height: 64, borderRadius: 10, background: C.g50, border: "1.5px solid " + C.g200, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, fontWeight: 700, fontFamily: FM, color: C.nv } }, d);
+          })
+        ),
+        ce("div", { style: { display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, padding: "5px 12px", borderRadius: 20, background: C.orS, border: "1px solid " + C.orB } },
+          ce(Icon, { name: "user", size: 13, color: C.or }),
+          ce("span", { style: { fontSize: 11, color: C.or, fontWeight: 700, fontFamily: FB } }, "Aguarde ser chamado(a) pela recep\u00e7\u00e3o")
+        )
+      ),
+      ce("div", { style: { position: "relative", height: 0 } }, ce("div", { style: Object.assign({}, notch, { left: -9, marginTop: -9 }) }), ce("div", { style: Object.assign({}, notch, { right: -9, marginTop: -9 }) })),
+      ce("div", { style: { background: C.g50, borderRadius: "0 0 16px 16px", padding: "16px 20px", borderTop: "2px dashed " + C.g200, textAlign: "left" } },
+        ce("div", { style: { display: "flex", gap: 10, alignItems: "flex-start" } },
+          ce("div", { style: { flexShrink: 0, width: 30, height: 30, borderRadius: 8, background: C.okB, display: "flex", alignItems: "center", justifyContent: "center" } }, ce(Icon, { name: "check", size: 16, color: C.ok })),
+          ce("div", null,
+            ce("div", { style: { fontSize: 12, fontWeight: 700, color: C.g700, fontFamily: FD, textTransform: "uppercase", letterSpacing: "0.03em", marginBottom: 3 } }, "Comparecimento registrado"),
+            ce("div", { style: { fontSize: 12, color: C.mu, lineHeight: 1.55 } }, "Sua presen\u00e7a para entrega de documenta\u00e7\u00e3o foi registrada. Mantenha esta senha vis\u00edvel e aguarde a recep\u00e7\u00e3o cham\u00e1-lo(a).")
+          )
+        )
+      )
+    ),
+    /* lista de documentos recolhível */
+    ce("div", { style: { background: C.wh, borderRadius: 14, border: "1px solid " + C.g200, marginTop: 14, overflow: "hidden" } },
+      ce("button", { onClick: function () { setAberto(!aberto); }, style: { width: "100%", padding: "14px 16px", background: aberto ? C.g50 : C.wh, border: "none", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", textAlign: "left" } },
+        ce("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
+          ce("div", { style: { width: 32, height: 32, borderRadius: 9, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, ce(Icon, { name: "download", size: 17, color: C.or })),
+          ce("span", { style: { fontSize: 13, fontWeight: 700, color: C.nv, fontFamily: FD, textTransform: "uppercase" } }, "Documentos para entregar")
+        ),
+        ce(Icon, { name: "arrow", size: 16, color: C.mu, style: { transform: aberto ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" } })
+      ),
+      aberto && ce("div", { style: { padding: "4px 16px 16px" } },
+        DOCS_RECEPCAO().map(function (doc, i) {
+          return ce("div", { key: i, style: { display: "flex", gap: 11, alignItems: "flex-start", padding: "11px 0", borderBottom: i < 4 ? "1px solid " + C.g100 : "none" } },
+            ce("span", { style: { flexShrink: 0, width: 22, height: 22, borderRadius: "50%", background: C.nv, color: C.wh, fontSize: 12, fontWeight: 700, fontFamily: FD, display: "flex", alignItems: "center", justifyContent: "center" } }, i + 1),
+            ce("div", null,
+              ce("div", { style: { fontSize: 13, fontWeight: 700, color: C.tx, fontFamily: FB, lineHeight: 1.3 } }, doc.t),
+              ce("div", { style: { fontSize: 12, color: C.mu, lineHeight: 1.45, marginTop: 2 } }, doc.d)
+            )
+          );
+        }),
+        ce("div", { style: { marginTop: 12, padding: "11px 13px", borderRadius: 10, background: C.wnB, border: "1px solid " + C.wnD, display: "flex", gap: 9, alignItems: "flex-start" } },
+          ce(Icon, { name: "warn", size: 16, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }),
+          ce("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.45 } }, ce("b", null, "Aten\u00e7\u00e3o: "), "os Anexos II e III devem ser baixados no site do programa, impressos, preenchidos \u00e0 m\u00e3o e assinados. N\u00e3o s\u00e3o aceitos sem assinatura.")
+        )
+      )
+    )
+  );
+}
+
+
 function StudentView(p) {
   var isPickupDay = p.pickupActive;
   var pickupTime = p.pickupTime;
@@ -261,6 +343,7 @@ function StudentView(p) {
   var terms = p.terms;
   var setTerms = p.setTerms;
   var dailyKey = p.dailyKey || "";
+  var modoRecepcao = p.modoRecepcao;
   var raS = useState("");
   var ra = raS[0];
   var setRa = raS[1];
@@ -286,7 +369,7 @@ function StudentView(p) {
     if (!r)
       return;
     setErro("");
-    if (liveDistro && !terms[r]) {
+    if (liveDistro && !modoRecepcao && !terms[r]) {
       setPendingRa(r);
       setShowTerms(true);
       return;
@@ -303,7 +386,7 @@ function StudentView(p) {
           setResultado(null);
           return;
         }
-        setResultado({ type: resp.jaRegistrado ? "already" : "success", nome: resp.nome, turma: resp.turma, time: resp.horaCheckin, pin: resp.pin, horario: resp.horario, distribuicao: resp.diaDistribuicao });
+        setResultado({ type: resp.jaRegistrado ? "already" : "success", nome: resp.nome, turma: resp.turma, curso: resp.curso, classificacao: resp.classificacao, time: resp.horaCheckin, pin: resp.pin, horario: resp.horario, distribuicao: resp.diaDistribuicao });
       }).catch(function() {
         setLoading(false);
         setErro("Erro de conex\xE3o. Tente novamente.");
@@ -319,7 +402,7 @@ function StudentView(p) {
         return;
       }
       var pin = liveDistro ? makePin(r, getToday()) : makePin(r, getToday());
-      setResultado({ type: "success", nome: stu.nome, turma: stu.turma, time: getNow(), pin, horario: pickupTime, distribuicao: liveDistro });
+      setResultado({ type: "success", nome: stu.nome, turma: stu.turma, curso: stu.turma, classificacao: stu.classificacao || "12", time: getNow(), pin, horario: pickupTime, distribuicao: liveDistro });
     }
   }
   function acceptTerms() {
@@ -345,7 +428,7 @@ function StudentView(p) {
       setShowTerms(false);
     }, style: { width: "100%", padding: 10, border: "none", background: "transparent", color: C.mu, fontFamily: FB, fontSize: 13, cursor: "pointer", marginTop: 6 } }, "Cancelar"))));
   }
-  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 440, margin: "0 auto", padding: "28px 18px", textAlign: "center", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: C.di, fontSize: 11, cursor: "pointer", fontFamily: FB, marginBottom: 24, opacity: 0.5, display: "inline-flex", alignItems: "center", gap: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 13, style: { transform: "rotate(180deg)" } }), " voltar"), /* @__PURE__ */ React.createElement(LogoMark, { size: 62, mb: 16 }), /* @__PURE__ */ React.createElement(PageTitle, { showPdq: liveDistro, mb: 6 }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, marginBottom: 20, fontSize: 14, lineHeight: 1.4 } }, liveDistro ? "Informe seu RA ou CPF para receber o c\xF3digo de retirada" : "Informe seu RA ou CPF para acessar o programa"), liveDistro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 16px", borderRadius: 12, marginBottom: 18, background: C.okB, border: "1px solid " + C.okD, display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, /* @__PURE__ */ React.createElement(BreadArt, { size: 22 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: C.ok, fontFamily: FB } }, "P\xE3o de queijo hoje \xB7 ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 440, margin: "0 auto", padding: "28px 18px", textAlign: "center", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: C.di, fontSize: 11, cursor: "pointer", fontFamily: FB, marginBottom: 24, opacity: 0.5, display: "inline-flex", alignItems: "center", gap: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 13, style: { transform: "rotate(180deg)" } }), " voltar"), /* @__PURE__ */ React.createElement(LogoMark, { size: 62, mb: 16 }), /* @__PURE__ */ React.createElement(PageTitle, { showPdq: liveDistro, mb: 6 }), /* @__PURE__ */ React.createElement("p", { style: { color: C.mu, marginBottom: 20, fontSize: 14, lineHeight: 1.4 } }, modoRecepcao ? "Informe seu CPF para receber sua senha de atendimento" : (liveDistro ? "Informe seu RA ou CPF para receber o c\xF3digo de retirada" : "Informe seu RA ou CPF para acessar o programa")), liveDistro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 16px", borderRadius: 12, marginBottom: 18, background: C.okB, border: "1px solid " + C.okD, display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, /* @__PURE__ */ React.createElement(BreadArt, { size: 22 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: C.ok, fontFamily: FB } }, "P\xE3o de queijo hoje \xB7 ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(
     "input",
     {
       type: "text",
@@ -361,7 +444,7 @@ function StudentView(p) {
       },
       style: { width: "100%", padding: "15px 18px", borderRadius: 13, border: "2px solid " + (erro ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 18, fontWeight: 600, outline: "none", boxSizing: "border-box", textAlign: "center", letterSpacing: "0.04em" }
     }
-  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.03em", boxShadow: "0 2px 0 " + C.orD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, loading ? /* @__PURE__ */ React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null)) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
+  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.03em", boxShadow: "0 2px 0 " + C.orD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, loading ? /* @__PURE__ */ React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
     return /* @__PURE__ */ React.createElement("button", { key: s.ra, onClick: function() {
       setRa(s.ra);
       setResultado(null);
@@ -594,6 +677,24 @@ function ConfigView(p) {
   var setActiveDays = p.setActiveDays;
   var onBack = p.onBack;
   var todayDow = getDow();
+  var mrS = useState(p.modoRecepcao || false);
+  var modoRec = mrS[0];
+  var setModoRec = mrS[1];
+  var mrLoadS = useState(false);
+  var mrLoading = mrLoadS[0];
+  var setMrLoading = mrLoadS[1];
+  function toggleModoRecepcao() {
+    var novo = !modoRec;
+    if (novo && !window.confirm("Ativar o MODO RECEP\u00c7\u00c3O?\n\nA tela do aluno passar\u00e1 a gerar SENHAS para candidatos do vestibular (entrega de documenta\u00e7\u00e3o), em vez do p\u00e3o de queijo. Lembre-se de desativar quando o evento terminar.")) return;
+    setMrLoading(true);
+    if (isApiConfigured()) {
+      apiPost({ action: "salvarModoRecepcao", ativo: novo, adminPin: ADMIN_CODE }).then(function(r) {
+        setMrLoading(false);
+        if (r.sucesso) setModoRec(novo);
+        else window.alert("N\u00e3o foi poss\u00edvel alterar: " + (r.erro || "erro"));
+      }).catch(function() { setMrLoading(false); window.alert("Erro de conex\u00e3o."); });
+    } else { setMrLoading(false); setModoRec(novo); }
+  }
   function toggleDay(d) {
     var nd = {};
     Object.keys(activeDays).forEach(function(k) {
@@ -612,7 +713,7 @@ function ConfigView(p) {
       });
     }
   }
-  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Configura\xE7\xF5es", badge: "Admin", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 18, maxWidth: 560, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 20, border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 16, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 4 } }, "Calend\xE1rio de Distribui\xE7\xE3o"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: C.mu, marginBottom: 18, lineHeight: 1.5 } }, "Defina em quais dias haver\xE1 p\xE3o de queijo. Nos demais, o app segue registrando presen\xE7a."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, [1, 2, 3, 4, 5, 6, 0].map(function(d) {
+  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx } }, /* @__PURE__ */ React.createElement(TopBar, { onBack, title: "Configura\xE7\xF5es", badge: "Admin", bt: "warning" }), /* @__PURE__ */ React.createElement("div", { style: { padding: 18, maxWidth: 560, margin: "0 auto", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { background: modoRec ? C.nv : C.wh, borderRadius: 16, padding: 20, border: "1px solid " + (modoRec ? C.nv : C.g200), marginBottom: 14, transition: "all 0.2s" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 18, color: modoRec ? C.wh : C.nv }), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 16, fontFamily: FD, textTransform: "uppercase", color: modoRec ? C.wh : C.nv } }, "Modo Recep\xE7\xE3o"), modoRec && /* @__PURE__ */ React.createElement("span", { style: { padding: "2px 9px", borderRadius: 20, fontSize: 10, fontWeight: 700, background: C.or, color: C.wh, textTransform: "uppercase" } }, "Ativo")), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: modoRec ? "rgba(255,255,255,0.75)" : C.mu, lineHeight: 1.5, margin: 0 } }, "Para eventos especiais (ex.: entrega de documenta\xE7\xE3o do vestibular). Gera senhas de atendimento para candidatos aprovados, em vez do p\xE3o de queijo.")), /* @__PURE__ */ React.createElement("button", { onClick: toggleModoRecepcao, disabled: mrLoading, style: { flexShrink: 0, width: 52, height: 30, borderRadius: 15, padding: 3, border: "none", background: modoRec ? C.or : C.g300, cursor: mrLoading ? "wait" : "pointer", display: "flex", alignItems: "center", opacity: mrLoading ? 0.6 : 1 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 24, height: 24, borderRadius: 12, background: C.wh, transition: "transform 0.2s", transform: modoRec ? "translateX(22px)" : "translateX(0)", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" } }))), modoRec && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "11px 14px", borderRadius: 10, background: "rgba(255,255,255,0.1)", display: "flex", gap: 9, alignItems: "flex-start" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.orL, style: { flexShrink: 0, marginTop: 1 } }), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.85)", lineHeight: 1.5 } }, "O hor\xE1rio de atendimento e o QR Code continuam valendo. Lembre-se de ", /* @__PURE__ */ React.createElement("b", null, "desativar"), " este modo quando o evento terminar, para voltar ao p\xE3o de queijo."))), /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: 20, border: "1px solid " + C.g200, marginBottom: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 16, fontFamily: FD, textTransform: "uppercase", color: C.nv, marginBottom: 4 } }, "Calend\xE1rio de Distribui\xE7\xE3o"), /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, color: C.mu, marginBottom: 18, lineHeight: 1.5 } }, "Defina em quais dias haver\xE1 p\xE3o de queijo. Nos demais, o app segue registrando presen\xE7a."), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } }, [1, 2, 3, 4, 5, 6, 0].map(function(d) {
     var on = activeDays[d];
     var isToday = d === todayDow;
     var fimDeSemana = d === 6 || d === 0;
@@ -1352,6 +1453,9 @@ function App() {
   var setAdminAuth = aaS[1];
   var dkS = useState(getUrlParam("k"));
   var dailyKey = dkS[0];
+  var mrS = useState(false);
+  var modoRecepcao = mrS[0];
+  var setModoRecepcao = mrS[1];
   useEffect(function() {
     if (!isApiConfigured())
       return;
@@ -1365,6 +1469,7 @@ function App() {
         setActiveDays(obj);
         if (r.horario)
           setPickupTime(r.horario);
+        setModoRecepcao(!!r.modoRecepcao);
       }
     }).catch(function() {
     });
@@ -1376,7 +1481,7 @@ function App() {
   }, []);
   var isPickupDay = activeDays[getDow()] || false;
   var liveDistro = isPickupDay && dentroDoHorario(pickupTime);
-  var sharedProps = { terms, setTerms, batch, setBatch, activeDays, setActiveDays, pickupActive: isPickupDay, pickupTime, avisos, dailyKey, onBack: function() {
+  var sharedProps = { terms, setTerms, batch, setBatch, activeDays, setActiveDays, pickupActive: isPickupDay, pickupTime, avisos, dailyKey, modoRecepcao, onBack: function() {
     setView("menu");
   } };
   var adminBack = function() {
@@ -1427,7 +1532,7 @@ function App() {
       style: { background: C.or, border: "none", borderRadius: 18, padding: "24px 22px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 16, boxShadow: "0 3px 0 " + C.orD + ", 0 10px 28px " + C.orG, animation: "fadeUp 0.45s ease both", animationDelay: "0.1s" }
     },
     /* @__PURE__ */ React.createElement("div", { style: { width: 52, height: 52, borderRadius: 14, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement(Icon, { name: "phone", size: 28, color: C.wh })),
-    /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 800, fontSize: 22, color: C.wh, textTransform: "uppercase", lineHeight: 1 } }, "Sou Aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 3 } }, liveDistro ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos")),
+    /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 800, fontSize: 22, color: C.wh, textTransform: "uppercase", lineHeight: 1 } }, modoRecepcao ? "Sou Candidato(a)" : "Sou Aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.85)", marginTop: 3 } }, modoRecepcao ? "Acesse para receber sua senha de atendimento" : (liveDistro ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos"))),
     /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 22, color: "rgba(255,255,255,0.7)" })
   ), /* @__PURE__ */ React.createElement(
     "button",
