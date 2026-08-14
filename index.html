@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FAMU-SBC · PREVIEW ALUNO</title>
+<title>FAMU-SBC · Pão de Queijo</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧀</text></svg>">
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -144,7 +144,7 @@ function getDow() {
   return (/* @__PURE__ */ new Date()).getDay();
 }
 function isApiConfigured() {
-  return false;
+  return API_URL.indexOf("COLE_SUA_URL") === -1;
 }
 function parseHorario(str) {
   var s = (str || "").toString();
@@ -1494,7 +1494,7 @@ function AdminPanel(p) {
   })))));
 }
 function App() {
-  var vS = useState("checkin");
+  var vS = useState("menu");
   var view = vS[0];
   var setView = vS[1];
   var tmS = useState({});
