@@ -209,6 +209,17 @@ function Spinner(p) {
   var c = p.color || C.or;
   return /* @__PURE__ */ React.createElement("div", { style: { display: "inline-block", width: s, height: s, border: "3px solid " + (p.track || C.g200), borderTopColor: c, borderRadius: "50%", animation: "spin 0.6s linear infinite" } });
 }
+function MorphLoader(p) {
+  var s = p.size || 26;
+  var c = p.color || C.wh;
+  return /* @__PURE__ */ React.createElement("svg", { width: s, height: s, viewBox: "0 0 100 100", fill: "none", stroke: c, strokeWidth: 4, strokeLinecap: "round", strokeLinejoin: "round", style: { display: "block" } },
+    /* @__PURE__ */ React.createElement("path", { d: "M32 42 C32 42 32 62 32 62 C32 72 40 72 50 72 C60 72 68 72 68 62 C68 62 68 42 68 42 Z" },
+      /* @__PURE__ */ React.createElement("animate", { attributeName: "d", dur: "2.6s", repeatCount: "indefinite", calcMode: "spline", keyTimes: "0;0.5;1", keySplines: "0.4 0 0.2 1;0.4 0 0.2 1", values: "M32 42 C32 42 32 62 32 62 C32 72 40 72 50 72 C60 72 68 72 68 62 C68 62 68 42 68 42 Z;M26 50 C26 37 37 28 50 28 C63 28 74 37 74 50 C74 63 63 72 50 72 C37 72 26 63 26 50 Z;M32 42 C32 42 32 62 32 62 C32 72 40 72 50 72 C60 72 68 72 68 62 C68 62 68 42 68 42 Z" })),
+    /* @__PURE__ */ React.createElement("path", { d: "M68 48 C80 48 80 60 68 60" }, /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.4;0.5;0.6;1", values: "1;0;0;0;1" })),
+    /* @__PURE__ */ React.createElement("path", { d: "M42 34 C38 28 42 24 42 20 M58 34 C54 28 58 24 58 20" }, /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.35;0.5;0.65;1", values: "0.85;0;0;0;0.85" })),
+    /* @__PURE__ */ React.createElement("g", { strokeWidth: 3.2 }, /* @__PURE__ */ React.createElement("path", { d: "M44 46 L44.5 46" }), /* @__PURE__ */ React.createElement("path", { d: "M56 44 L56.5 44" }), /* @__PURE__ */ React.createElement("path", { d: "M50 56 L50.5 56" }), /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.4;0.5;0.6;1", values: "0;0;1;0;0" })),
+    /* @__PURE__ */ React.createElement("path", { d: "M28 78 L72 78" }, /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.4;0.5;0.6;1", values: "1;0;0;0;1" })));
+}
 function LogoMark(p) {
   var sz = p.size || 80;
   return /* @__PURE__ */ React.createElement("div", { style: { width: sz, height: sz, borderRadius: sz * 0.24, background: C.or, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", margin: "0 auto " + (p.mb != null ? p.mb : 20) + "px", lineHeight: 1.05, boxShadow: "0 2px 0 " + C.orD + ", 0 8px 24px " + C.orG } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: sz * 0.27, color: C.wh, fontWeight: 900, fontFamily: FD, letterSpacing: "0.02em" } }, "FAMU"), /* @__PURE__ */ React.createElement("span", { style: { fontSize: sz * 0.17, color: "rgba(255,255,255,0.85)", fontWeight: 700, fontFamily: FD, letterSpacing: "0.18em" } }, "SBC"));
@@ -444,7 +455,7 @@ function StudentView(p) {
       },
       style: { width: "100%", padding: "15px 18px", borderRadius: 13, border: "2px solid " + (erro ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 18, fontWeight: 600, outline: "none", boxSizing: "border-box", textAlign: "center", letterSpacing: "0.04em" }
     }
-  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.03em", boxShadow: "0 2px 0 " + C.orD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, loading ? /* @__PURE__ */ React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
+  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.03em", boxShadow: "0 2px 0 " + C.orD, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 } }, loading ? /* @__PURE__ */ (modoRecepcao ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : React.createElement(MorphLoader, { size: 26, color: C.wh })) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
     return /* @__PURE__ */ React.createElement("button", { key: s.ra, onClick: function() {
       setRa(s.ra);
       setResultado(null);
@@ -522,7 +533,7 @@ function OperatorView(p) {
       return;
     setLoading(true);
     if (isApiConfigured()) {
-      apiPost({ action: "validarPin", pin: code }).then(function(r) {
+      apiPost({ action: "validarPin", pin: code, adminPin: ADMIN_CODE }).then(function(r) {
         setLoading(false);
         if (!r.sucesso) {
           setFeedback({ t: r.jaRetirou ? "warning" : "error", m: r.erro });
@@ -575,7 +586,7 @@ function OperatorView(p) {
       return;
     if (isApiConfigured()) {
       setRefreshing(true);
-      apiPost({ action: "addFornada", qtd: n }).then(function(r) {
+      apiPost({ action: "addFornada", qtd: n, adminPin: ADMIN_CODE }).then(function(r) {
         if (r.sucesso)
           setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
         setRefreshing(false);
@@ -593,7 +604,7 @@ function OperatorView(p) {
       return;
     if (isApiConfigured()) {
       setRefreshing(true);
-      apiPost({ action: "resetFornada" }).then(function(r) {
+      apiPost({ action: "resetFornada", adminPin: ADMIN_CODE }).then(function(r) {
         if (r.sucesso)
           setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
         setRefreshing(false);
@@ -612,7 +623,7 @@ function OperatorView(p) {
       return;
     setAdminLoading(true);
     setAdminResult(null);
-    apiPost({ action: "checkinAdmin", ra: r }).then(function(resp) {
+    apiPost({ action: "checkinAdmin", ra: r, adminPin: ADMIN_CODE }).then(function(resp) {
       setAdminLoading(false);
       if (!resp.sucesso) {
         setAdminResult({ t: "error", m: resp.erro });
@@ -749,7 +760,7 @@ function DashView(p) {
   var setDashData = dashS[1];
   useEffect(function() {
     if (isApiConfigured()) {
-      apiGet("dashboard").then(function(r) {
+      apiGet("dashboard", { adminPin: ADMIN_CODE }).then(function(r) {
         if (r.sucesso)
           setDashData(r);
       }).catch(function() {
@@ -1510,7 +1521,7 @@ function App() {
     if (isNaN(n) || n <= 0)
       return;
     if (isApiConfigured()) {
-      apiPost({ action: "addFornada", qtd: n }).then(function(r) {
+      apiPost({ action: "addFornada", qtd: n, adminPin: ADMIN_CODE }).then(function(r) {
         if (r.sucesso)
           setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
       }).catch(function() {
