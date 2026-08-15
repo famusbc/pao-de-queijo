@@ -194,22 +194,9 @@ var GCSS = [
 
   /* Fundo ornamental: simbolos desenhados por traco, surgindo e sumindo.
      Fica atras do conteudo (z-index 0; o conteudo usa z-index 2). */
-  ".amb{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;--ambOp:0.09}",
-  ".amb i{position:absolute;display:block;line-height:0}",
   /* ancoradas nas margens laterais: 50% menos (metade da coluna + folga + largura) */
-  ".amb .p1{top:9%;left:calc(50% - 350px);width:112px;height:112px}",
-  ".amb .p2{bottom:9%;right:calc(50% - 350px);width:112px;height:112px}",
   /* Abaixo de 800px nao ha margem livre: as xicaras vao para tras do conteudo,
      em intensidade bem menor — viram textura, nao desenho, e nao competem com a leitura. */
-  "@media(max-width:800px){.amb{--ambOp:0.04}.amb .p1{top:6%;left:4%;width:96px;height:96px}.amb .p2{bottom:6%;right:4%;width:96px;height:96px}}",
-  ".amb svg{width:100%;height:100%;display:block;overflow:visible}",
-  ".amb path{fill:none;stroke:" + C.nv + ";stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}",
-  ".amb i{opacity:0;animation:ambSurge 14s ease-in-out infinite}",
-  ".amb .p2,.amb .p2 path{animation-delay:7s}",
-  ".amb i path{animation:ambTraco 14s ease-in-out infinite}",
-  "@keyframes ambTraco{0%{stroke-dashoffset:1}30%{stroke-dashoffset:0}62%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}",
-  "@keyframes ambSurge{0%,100%{opacity:0}12%,60%{opacity:var(--ambOp,0.09)}}",
-  "@media (prefers-reduced-motion:reduce){.amb i,.amb i path{animation:none}.amb i{opacity:var(--ambOp,0.09)}.amb path{stroke-dashoffset:0}}"
 ].join("\n");
 function Icon(p) {
   var s = p.size || 24;
@@ -259,18 +246,6 @@ function MorphLoader(p) {
     /* @__PURE__ */ React.createElement("path", { d: "M42 34 C38 28 42 24 42 20 M58 34 C54 28 58 24 58 20" }, /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.35;0.5;0.65;1", values: "0.85;0;0;0;0.85" })),
     /* @__PURE__ */ React.createElement("g", { strokeWidth: 3.2 }, /* @__PURE__ */ React.createElement("path", { d: "M44 46 L44.5 46" }), /* @__PURE__ */ React.createElement("path", { d: "M56 44 L56.5 44" }), /* @__PURE__ */ React.createElement("path", { d: "M50 56 L50.5 56" }), /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.4;0.5;0.6;1", values: "0;0;1;0;0" })),
     /* @__PURE__ */ React.createElement("path", { d: "M28 78 L72 78" }, /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.4;0.5;0.6;1", values: "1;0;0;0;1" })));
-}
-function FundoAmbiente() {
-  var xicara = function (cls) {
-    return /* @__PURE__ */ React.createElement("i", { className: cls },
-      /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 76 76" },
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M14 30h34v20a14 14 0 0 1-14 14H28a14 14 0 0 1-14-14z" }),
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M48 36h7a8 8 0 0 1 0 16h-7" }),
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M24 20c-3-4 1-7 1-11M34 20c-3-4 1-7 1-11M44 20c-3-4 1-7 1-11" }),
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M8 70h46" })));
-  };
-  return /* @__PURE__ */ React.createElement("div", { className: "amb", "aria-hidden": "true" },
-    xicara("p1"), xicara("p2"));
 }
 function LogoMark(p) {
   var sz = p.size || 80;
@@ -457,6 +432,50 @@ function StudentView(p) {
   var setPendingRa = prS[1];
   var liveDistro = isPickupDay && dentroDoHorario(pickupTime);
   var displayTime = pickupTime || "18:00 \xE0s 20:00";
+  var restS = useState(false);
+  var restaurado = restS[0];
+  var setRestaurado = restS[1];
+
+  /* O codigo do dia fica guardado no proprio aparelho. Reabrir o app
+     mostra o comprovante na hora, sem nova consulta ao servidor. */
+  var CHAVE_COD = "famu_codigo_v1";
+  function guardarCodigo(res, identificador) {
+    try {
+      if (!res || !res.pin) return;
+      localStorage.setItem(CHAVE_COD, JSON.stringify({
+        data: getToday(),
+        modo: modoRecepcao ? "recepcao" : "pao",
+        ra: identificador || "",
+        resultado: res
+      }));
+    } catch (e) { /* modo privado ou armazenamento cheio: segue sem guardar */ }
+  }
+  function limparCodigo() {
+    try { localStorage.removeItem(CHAVE_COD); } catch (e) {}
+  }
+  useEffect(function () {
+    try {
+      var bruto = localStorage.getItem(CHAVE_COD);
+      if (!bruto) return;
+      var g = JSON.parse(bruto);
+      /* so vale para hoje e para o modo atual */
+      if (!g || g.data !== getToday()) { limparCodigo(); return; }
+      if (g.modo !== (modoRecepcao ? "recepcao" : "pao")) return;
+      if (!g.resultado || !g.resultado.pin) return;
+      setResultado(g.resultado);
+      setRa(g.ra || "");
+      setRestaurado(true);
+    } catch (e) { /* dado corrompido: ignora */ }
+  }, []);
+
+  function usarOutroRa() {
+    limparCodigo();
+    setResultado(null);
+    setRestaurado(false);
+    setRa("");
+    setErro("");
+  }
+
   function handleAccess() {
     var r = ra.trim();
     if (!r)
@@ -479,7 +498,9 @@ function StudentView(p) {
           setResultado(null);
           return;
         }
-        setResultado({ type: resp.jaRegistrado ? "already" : "success", nome: resp.nome, turma: resp.turma, curso: resp.curso, classificacao: resp.classificacao, time: resp.horaCheckin, pin: resp.pin, horario: resp.horario, distribuicao: resp.diaDistribuicao });
+        var _res = { type: resp.jaRegistrado ? "already" : "success", nome: resp.nome, turma: resp.turma, curso: resp.curso, classificacao: resp.classificacao, time: resp.horaCheckin, pin: resp.pin, horario: resp.horario, distribuicao: resp.diaDistribuicao };
+        setResultado(_res);
+        guardarCodigo(_res, r);
       }).catch(function() {
         setLoading(false);
         setErro("Erro de conex\xE3o. Tente novamente.");
@@ -495,7 +516,9 @@ function StudentView(p) {
         return;
       }
       var pin = liveDistro ? makePin(r, getToday()) : makePin(r, getToday());
-      setResultado({ type: "success", nome: stu.nome, turma: stu.turma, curso: stu.turma, classificacao: stu.classificacao || "12", time: getNow(), pin, horario: pickupTime, distribuicao: liveDistro });
+      var _resD = { type: "success", nome: stu.nome, turma: stu.turma, curso: stu.turma, classificacao: stu.classificacao || "12", time: getNow(), pin, horario: pickupTime, distribuicao: liveDistro };
+      setResultado(_resD);
+      guardarCodigo(_resD, r);
     }
   }
   function acceptTerms() {
@@ -521,7 +544,7 @@ function StudentView(p) {
       setShowTerms(false);
     }, style: { width: "100%", padding: 10, border: "none", background: "transparent", color: C.mu, fontFamily: FB, fontSize: 13, cursor: "pointer", marginTop: 6 } }, "Cancelar"))));
   }
-  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: S.sunken, fontFamily: FB, color: S.ink } }, /* @__PURE__ */ React.createElement(FundoAmbiente, null), /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 440, margin: "0 auto", padding: "28px 18px", textAlign: "left", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: S.ink3, fontSize: 12, cursor: "pointer", fontFamily: FB, marginBottom: 24, opacity: 1, display: "inline-flex", alignItems: "center", gap: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 13, style: { transform: "rotate(180deg)" } }), " voltar"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 22 } },
+  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: S.sunken, fontFamily: FB, color: S.ink } }, /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 440, margin: "0 auto", padding: "28px 18px", textAlign: "left", position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("button", { onClick: onBack, style: { background: "none", border: "none", color: S.ink3, fontSize: 12, cursor: "pointer", fontFamily: FB, marginBottom: 24, opacity: 1, display: "inline-flex", alignItems: "center", gap: 5 } }, /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 13, style: { transform: "rotate(180deg)" } }), " voltar"), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", marginBottom: 22 } },
       /* @__PURE__ */ React.createElement(LogoMark, { size: 64, mb: 16 }),
       /* @__PURE__ */ React.createElement(PageTitle, { showPdq: false, mb: 14 }),
       /* @__PURE__ */ React.createElement("p", { style: { color: S.ink2, fontSize: 13, lineHeight: 1.55, maxWidth: 310, margin: "0 auto" } }, modoRecepcao ? "Informe seu CPF para receber sua senha de atendimento." : (liveDistro ? "Informe seu RA ou CPF para receber o c\xF3digo de retirada de hoje." : "Informe seu RA ou CPF para acessar o programa."))), liveDistro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 16px", borderRadius: 8, marginBottom: 18, background: S.paper, border: "1px solid " + S.line, display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, /* @__PURE__ */ React.createElement(BreadArt, { size: 22 }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 600, color: S.nv, fontFamily: FB } }, "P\xE3o de queijo hoje \xB7 ", displayTime)), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, /* @__PURE__ */ React.createElement(
@@ -540,7 +563,7 @@ function StudentView(p) {
       },
       style: { width: "100%", padding: "15px 16px", borderRadius: 8, border: "1px solid " + (erro ? S.or : S.line2), background: S.paper, color: S.nv, fontFamily: FM, fontSize: 20, fontWeight: 500, outline: "none", boxSizing: "border-box", textAlign: "center", letterSpacing: "0.05em" }
     }
-  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 8, border: "none", background: S.or, color: "#FFFFFF", fontFamily: FD, fontWeight: 700, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, loading ? /* @__PURE__ */ (modoRecepcao ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : React.createElement(MorphLoader, { size: 26, color: C.wh })) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ (avisosAtivos && avisos && avisos.length > 0 ? /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }) : null), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
+  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 8, border: "none", background: S.or, color: "#FFFFFF", fontFamily: FD, fontWeight: 700, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, loading ? /* @__PURE__ */ (modoRecepcao ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : React.createElement(MorphLoader, { size: 26, color: C.wh })) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ (restaurado ? /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, textAlign: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: usarOutroRa, style: { background: "none", border: "none", color: S.ink3, fontSize: 12, fontFamily: FB, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3, padding: 6 } }, "N\xE3o \xE9 voc\xEA? Usar outro RA")) : null), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ (avisosAtivos && avisos && avisos.length > 0 ? /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }) : null), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
     return /* @__PURE__ */ React.createElement("button", { key: s.ra, onClick: function() {
       setRa(s.ra);
       setResultado(null);
@@ -1638,7 +1661,7 @@ function App() {
       setAdminAuth(false);
       setView("menu");
     } }));
-  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: S.sunken, fontFamily: FB, color: S.ink, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement(FundoAmbiente, null), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 28, position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 84, mb: 22 }), /* @__PURE__ */ React.createElement(PageTitle, { showPdq: liveDistro, mb: 30 })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 12 } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: S.sunken, fontFamily: FB, color: S.ink, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("style", null, GCSS), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 28, position: "relative", zIndex: 2 } }, /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 420, animation: "fadeUp 0.5s ease both" } }, /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement(LogoMark, { size: 84, mb: 22 }), /* @__PURE__ */ React.createElement(PageTitle, { showPdq: liveDistro, mb: 30 })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 12 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: function() {
