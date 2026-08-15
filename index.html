@@ -197,13 +197,13 @@ var GCSS = [
   ".amb{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}",
   ".amb i{position:absolute;display:block;line-height:0}",
   ".amb .p1{top:5%;left:6%;width:112px;height:112px}",
-  ".amb .p2{bottom:7%;right:7%;width:120px;height:120px}",
-  "@media(max-width:520px){.amb .p1{width:92px;height:92px}.amb .p2{width:98px;height:98px}}",
+  ".amb .p2{bottom:7%;right:7%;width:112px;height:112px}",
+  "@media(max-width:520px){.amb .p1{width:92px;height:92px}.amb .p2{width:92px;height:92px}}",
   ".amb svg{width:100%;height:100%;display:block;overflow:visible}",
   ".amb path{fill:none;stroke:" + C.nv + ";stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}",
   ".amb i{opacity:0;animation:ambSurge 14s ease-in-out infinite}",
-  ".amb i path{animation:ambTraco 14s ease-in-out infinite}",
   ".amb .p2,.amb .p2 path{animation-delay:7s}",
+  ".amb i path{animation:ambTraco 14s ease-in-out infinite}",
   "@keyframes ambTraco{0%{stroke-dashoffset:1}30%{stroke-dashoffset:0}62%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}",
   "@keyframes ambSurge{0%,100%{opacity:0}12%,60%{opacity:0.09}}",
   "@media (prefers-reduced-motion:reduce){.amb i,.amb i path{animation:none}.amb i{opacity:0.07}.amb path{stroke-dashoffset:0}}"
@@ -258,19 +258,16 @@ function MorphLoader(p) {
     /* @__PURE__ */ React.createElement("path", { d: "M28 78 L72 78" }, /* @__PURE__ */ React.createElement("animate", { attributeName: "opacity", dur: "2.6s", repeatCount: "indefinite", keyTimes: "0;0.4;0.5;0.6;1", values: "1;0;0;0;1" })));
 }
 function FundoAmbiente() {
-  return /* @__PURE__ */ React.createElement("div", { className: "amb", "aria-hidden": "true" },
-    /* xicara com vapor */
-    /* @__PURE__ */ React.createElement("i", { className: "p1" },
+  var xicara = function (cls) {
+    return /* @__PURE__ */ React.createElement("i", { className: cls },
       /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 76 76" },
         /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M14 30h34v20a14 14 0 0 1-14 14H28a14 14 0 0 1-14-14z" }),
         /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M48 36h7a8 8 0 0 1 0 16h-7" }),
         /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M24 20c-3-4 1-7 1-11M34 20c-3-4 1-7 1-11M44 20c-3-4 1-7 1-11" }),
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M8 70h46" }))),
-    /* notebook */
-    /* @__PURE__ */ React.createElement("i", { className: "p2" },
-      /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 76 66" },
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M14 8h48v34H14z" }),
-        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M6 48h64l-5 9H11z" }))));
+        /* @__PURE__ */ React.createElement("path", { pathLength: 1, d: "M8 70h46" })));
+  };
+  return /* @__PURE__ */ React.createElement("div", { className: "amb", "aria-hidden": "true" },
+    xicara("p1"), xicara("p2"));
 }
 function LogoMark(p) {
   var sz = p.size || 80;
