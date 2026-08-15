@@ -425,6 +425,41 @@ function EsqueletoTicket() {
       })),
       barra("78%", 9, S.line, 16)));
 }
+/* Bloco de erro com orientacao: diz o que houve e o que fazer a seguir.
+   Uma linha de texto seca deixa o aluno sem saida e gera fila na secretaria. */
+function AvisoErro(p) {
+  var grave = p.tipo === "conexao";
+  var cor = grave ? S.warn : S.or;
+  var fundo = grave ? "rgba(138,100,16,0.07)" : "rgba(232,97,26,0.07)";
+  return /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "15px 16px", borderRadius: 10, background: fundo, border: "1px solid " + cor + "44", textAlign: "left" } },
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10, alignItems: "flex-start" } },
+      /* @__PURE__ */ React.createElement(Icon, { name: grave ? "refresh" : "warn", size: 17, color: cor, style: { flexShrink: 0, marginTop: 1 } }),
+      /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } },
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13.5, fontWeight: 700, color: cor, fontFamily: FB, lineHeight: 1.3 } }, p.titulo),
+        p.texto ? /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12.5, color: S.ink2, lineHeight: 1.55, marginTop: 5 } }, p.texto) : null,
+        p.onTentar ? /* @__PURE__ */ React.createElement("button", { onClick: p.onTentar, style: { marginTop: 11, padding: "9px 16px", borderRadius: 7, border: "none", background: S.nv, color: "#FFFFFF", fontSize: 12.5, fontWeight: 600, fontFamily: FB, cursor: "pointer" } }, "Tentar de novo") : null)));
+}
+
+/* Traduz o erro do servidor em titulo + orientacao pratica. */
+function interpretarErro(msg) {
+  var m = (msg || "").toString().toLowerCase();
+  if (m.indexOf("n\xE3o encontrado") > -1 || m.indexOf("nao encontrado") > -1) {
+    return { titulo: "N\xE3o encontramos esse n\xFAmero", texto: "Confira se digitou o RA ou o CPF corretamente, sem pontos ou tra\xE7os. Se estiver certo e mesmo assim n\xE3o funcionar, procure a secretaria \u2014 seu cadastro pode estar pendente." };
+  }
+  if (m.indexOf("status") > -1 || m.indexOf("autorizado") > -1) {
+    return { titulo: "Cadastro sem libera\xE7\xE3o no momento", texto: "Seu registro existe, mas o status atual n\xE3o permite a retirada. Procure a secretaria para regularizar." };
+  }
+  if (m.indexOf("hor\xE1rio") > -1 || m.indexOf("horario") > -1) {
+    return { titulo: "Fora do hor\xE1rio", texto: msg };
+  }
+  if (m.indexOf("qr") > -1 || m.indexOf("chave") > -1 || m.indexOf("v\xE1lido") > -1) {
+    return { titulo: "C\xF3digo do dia inv\xE1lido", texto: "Leia novamente o QR Code exposto no local. O c\xF3digo muda todos os dias." };
+  }
+  if (m.indexOf("muitas tentativas") > -1) {
+    return { titulo: "Muitas tentativas seguidas", texto: "Aguarde um instante antes de tentar de novo." };
+  }
+  return { titulo: "N\xE3o foi poss\xEDvel concluir", texto: msg };
+}
 function StudentView(p) {
   var isPickupDay = p.pickupActive;
   var pickupTime = p.pickupTime;
@@ -461,6 +496,22 @@ function StudentView(p) {
   var esqS = useState(false);
   var mostrarEsqueleto = esqS[0];
   var setMostrarEsqueleto = esqS[1];
+  var falS = useState(null);
+  var falha = falS[0];
+  var setFalha = falS[1];
+
+  /* Le o codigo guardado sem alterar a tela — usado quando a rede cai. */
+  function lerCodigoGuardado() {
+    try {
+      var bruto = localStorage.getItem(CHAVE_COD);
+      if (!bruto) return null;
+      var g = JSON.parse(bruto);
+      if (!g || g.data !== getToday()) return null;
+      if (g.modo !== (modoRecepcao ? "recepcao" : "pao")) return null;
+      if (!g.resultado || !g.resultado.pin) return null;
+      return g.resultado;
+    } catch (e) { return null; }
+  }
 
   /* So mostra o esqueleto se a espera passar de 500ms. Abaixo disso,
      ele apareceria e sumiria num piscar, o que atrapalha em vez de ajudar. */
@@ -515,6 +566,7 @@ function StudentView(p) {
     if (!r)
       return;
     setErro("");
+    setFalha(null);
     if (liveDistro && !modoRecepcao && !terms[r]) {
       setPendingRa(r);
       setShowTerms(true);
@@ -537,7 +589,16 @@ function StudentView(p) {
         guardarCodigo(_res, r);
       }).catch(function() {
         setLoading(false);
-        setErro("Erro de conex\xE3o. Tente novamente.");
+        /* Se ja existe codigo guardado de hoje, ele continua valido:
+           mostra o comprovante mesmo sem rede, em vez de deixar o aluno na mao. */
+        var guardado = lerCodigoGuardado();
+        if (guardado) {
+          setResultado(guardado);
+          setRestaurado(true);
+          setFalha({ semRede: true, comCodigo: true });
+          return;
+        }
+        setFalha({ semRede: true, comCodigo: false });
       });
     } else {
       var stu = DEMO_STU.find(function(s) {
@@ -597,7 +658,7 @@ function StudentView(p) {
       },
       style: { width: "100%", padding: "15px 16px", borderRadius: 8, border: "1px solid " + (erro ? S.or : S.line2), background: S.paper, color: S.nv, fontFamily: FM, fontSize: 20, fontWeight: 500, outline: "none", boxSizing: "border-box", textAlign: "center", letterSpacing: "0.05em" }
     }
-  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 8, border: "none", background: S.or, color: "#FFFFFF", fontFamily: FD, fontWeight: 700, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, loading ? /* @__PURE__ */ (modoRecepcao ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : React.createElement(MorphLoader, { size: 26, color: C.wh })) : "Acessar")), erro && /* @__PURE__ */ React.createElement("div", { style: { padding: "11px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, marginTop: 12, border: "1px solid " + C.orB, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "warn", size: 15, color: C.or }), " ", erro), (mostrarEsqueleto && !resultado ? /* @__PURE__ */ React.createElement(EsqueletoTicket, null) : null), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ (restaurado ? /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, textAlign: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: usarOutroRa, style: { background: "none", border: "none", color: S.ink3, fontSize: 12, fontFamily: FB, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3, padding: 6 } }, "N\xE3o \xE9 voc\xEA? Usar outro RA")) : null), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ (avisosAtivos && avisos && avisos.length > 0 ? /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }) : null), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
+  ), /* @__PURE__ */ React.createElement("button", { onClick: handleAccess, disabled: loading, style: { width: "100%", padding: "15px 24px", borderRadius: 8, border: "none", background: S.or, color: "#FFFFFF", fontFamily: FD, fontWeight: 700, fontSize: 16, cursor: loading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em", display: "flex", alignItems: "center", justifyContent: "center", gap: 9 } }, loading ? /* @__PURE__ */ (modoRecepcao ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : React.createElement(MorphLoader, { size: 26, color: C.wh })) : "Acessar")), (erro ? /* @__PURE__ */ React.createElement(AvisoErro, { tipo: "dado", titulo: interpretarErro(erro).titulo, texto: interpretarErro(erro).texto }) : null), (falha ? /* @__PURE__ */ React.createElement(AvisoErro, { tipo: "conexao", titulo: falha.comCodigo ? "Sem conex\xE3o \u2014 mostrando o c\xF3digo guardado" : "Sem conex\xE3o com o sistema", texto: falha.comCodigo ? "O c\xF3digo abaixo foi gerado hoje e continua v\xE1lido. Pode apresent\xE1-lo normalmente." : "N\xE3o conseguimos falar com o servidor. Verifique sua internet e tente de novo. Se voc\xEA j\xE1 gerou seu c\xF3digo hoje, ele continua valendo.", onTentar: falha.comCodigo ? null : handleAccess }) : null), (mostrarEsqueleto && !resultado ? /* @__PURE__ */ React.createElement(EsqueletoTicket, null) : null), resultado && /* @__PURE__ */ React.createElement("div", null, resultado.pin ? /* @__PURE__ */ (modoRecepcao ? /* @__PURE__ */ React.createElement(RecepcaoCard, { resultado }) : React.createElement("div", null, /* @__PURE__ */ React.createElement(Ticket, { distribuicao: resultado.distribuicao, pin: resultado.pin, nome: resultado.nome, turma: resultado.turma, time: resultado.time, displayTime, already: resultado.type === "already" }), resultado.type === "already" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontSize: 12, color: C.wn, fontWeight: 600, fontFamily: FB } }, "Este c\xF3digo j\xE1 havia sido gerado hoje."), /* @__PURE__ */ React.createElement(LembreteBox, null))) : /* @__PURE__ */ React.createElement("div", { style: { animation: "scaleIn 0.35s ease both", marginTop: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { background: C.wh, borderRadius: 16, padding: "22px 20px", border: "1px solid " + C.g200, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { width: 46, height: 46, borderRadius: 12, background: C.orS, display: "flex", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Icon, { name: "user", size: 24, color: C.or }))), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: C.mu, textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 700, fontFamily: FB } }, "Bem-vindo(a)"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase" } }, resultado.nome), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: C.mu, fontFamily: FM, marginTop: 2 } }, resultado.turma, " \xB7 ", resultado.time)), /* @__PURE__ */ React.createElement(LembreteBox, null))), /* @__PURE__ */ (restaurado ? /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, textAlign: "center" } }, /* @__PURE__ */ React.createElement("button", { onClick: usarOutroRa, style: { background: "none", border: "none", color: S.ink3, fontSize: 12, fontFamily: FB, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3, padding: 6 } }, "N\xE3o \xE9 voc\xEA? Usar outro RA")) : null), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), /* @__PURE__ */ (avisosAtivos && avisos && avisos.length > 0 ? /* @__PURE__ */ React.createElement(MuralAvisos, { avisos }) : null), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, padding: 14, background: C.wh, borderRadius: 12, border: "1px solid " + C.g200 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: C.mu, marginBottom: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" } }, "RAs de demonstra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center" } }, DEMO_STU.map(function(s) {
     return /* @__PURE__ */ React.createElement("button", { key: s.ra, onClick: function() {
       setRa(s.ra);
       setResultado(null);
