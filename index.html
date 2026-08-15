@@ -106,7 +106,7 @@ var S = {
   ink: "#141922", ink2: "#4A5563", ink3: "#8A93A0",
   ok: "#12704A", warn: "#8A6410"
 };
-var FD = "'Barlow Condensed','Arial Narrow',sans-serif";var FB = "'Barlow','Helvetica Neue',sans-serif";
+var FD = "'Archivo','Helvetica Neue',sans-serif";var FB = "'Barlow','Helvetica Neue',sans-serif";
 var FM = "'IBM Plex Mono','SF Mono',monospace";
 var WA_LINK = "https://wa.me/551123633775";
 function getUrlParam(name) {
@@ -165,7 +165,7 @@ function dentroDoHorario(str) {
   return nowMin >= hr.startMin && nowMin < hr.endMin;
 }
 var GCSS = [
-  "@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');",
+  "@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');",
   "*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}",
   "body{background:" + C.ow + "}",
   "::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:" + C.g100 + "}::-webkit-scrollbar-thumb{background:" + C.g300 + ";border-radius:3px}",
@@ -280,7 +280,7 @@ function Ticket(p) {
     /* cabeçalho: o nome como momento de reconhecimento */
     /* @__PURE__ */ React.createElement("div", { style: { background: S.nv, padding: "19px 20px 17px", position: "relative" } },
       /* @__PURE__ */ React.createElement("div", { style: { fontSize: 9.5, color: "rgba(255,255,255,0.55)", fontFamily: FB, fontWeight: 700, letterSpacing: "0.17em", textTransform: "uppercase" } }, "Bem-vindo(a)"),
-      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 23, fontWeight: 600, fontFamily: FD, color: "#FFFFFF", lineHeight: 1.14, marginTop: 7, letterSpacing: "0.004em" } }, nome),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 600, fontFamily: FD, color: "#FFFFFF", lineHeight: 1.2, marginTop: 7, letterSpacing: "-0.011em" } }, nome),
       /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 9, marginTop: 9, fontFamily: FM, fontSize: 11, color: "rgba(255,255,255,0.62)" } },
         turma ? /* @__PURE__ */ React.createElement("span", null, turma) : null,
         turma ? /* @__PURE__ */ React.createElement("span", { style: { width: 3, height: 3, borderRadius: "50%", background: "rgba(255,255,255,0.34)", display: "block" } }) : null,
@@ -1607,7 +1607,7 @@ function App() {
       style: { background: S.nv, border: "1px solid " + S.nv, borderRadius: 10, padding: "20px 18px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, animation: "fadeUp 0.45s ease both", animationDelay: "0.1s" }
     },
     /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 40, borderRadius: 9, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement(Icon, { name: "phone", size: 21, color: "#FFFFFF" })),
-    /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: 18, color: "#FFFFFF", textTransform: "uppercase", lineHeight: 1.1, letterSpacing: "0.03em" } }, modoRecepcao ? "Sou candidato(a)" : "Sou aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12.5, color: "rgba(255,255,255,0.72)", marginTop: 4, lineHeight: 1.4 } }, modoRecepcao ? "Acesse para receber sua senha de atendimento" : (liveDistro ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos"))),
+    /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: 15.5, color: "#FFFFFF", textTransform: "uppercase", lineHeight: 1.15, letterSpacing: "0.012em" } }, modoRecepcao ? "Sou candidato(a)" : "Sou aluno"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12.5, color: "rgba(255,255,255,0.72)", marginTop: 4, lineHeight: 1.4 } }, modoRecepcao ? "Acesse para receber sua senha de atendimento" : (liveDistro ? "Acesse para retirar seu p\xE3o de queijo" : "Acesse o programa e veja os avisos"))),
     /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 22, color: "rgba(255,255,255,0.7)" })
   ), /* @__PURE__ */ React.createElement(
     "button",
@@ -1618,7 +1618,7 @@ function App() {
       style: { background: S.paper, border: "1px solid " + S.line, borderRadius: 10, padding: "17px 18px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, animation: "fadeUp 0.45s ease both", animationDelay: "0.2s" }
     },
     /* @__PURE__ */ React.createElement("div", { style: { width: 38, height: 38, borderRadius: 9, background: S.sunken, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement(Icon, { name: "lock", size: 19, color: S.nv })),
-    /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: 16.5, color: S.nv, textTransform: "uppercase", letterSpacing: "0.03em", lineHeight: 1.1 } }, "Administra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: S.ink2, marginTop: 3, lineHeight: 1.4 } }, "Acesso da equipe")),
+    /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: 14.5, color: S.nv, textTransform: "uppercase", letterSpacing: "0.012em", lineHeight: 1.15 } }, "Administra\xE7\xE3o"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: S.ink2, marginTop: 3, lineHeight: 1.4 } }, "Acesso da equipe")),
     /* @__PURE__ */ React.createElement(Icon, { name: "arrow", size: 16, color: C.di })
   )), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 28 } }, /* @__PURE__ */ React.createElement(WhatsAppBtn, null)), !isApiConfigured() && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "11px 16px", borderRadius: 11, background: C.wh, border: "1px solid " + C.g200, fontSize: 10, color: C.di, textAlign: "center" } }, "Modo demonstra\xE7\xE3o \xB7 Configure API_URL para conectar ao Google Sheets"))));
 }
