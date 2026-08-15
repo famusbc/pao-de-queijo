@@ -194,19 +194,22 @@ var GCSS = [
 
   /* Fundo ornamental: simbolos desenhados por traco, surgindo e sumindo.
      Fica atras do conteudo (z-index 0; o conteudo usa z-index 2). */
-  ".amb{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}",
+  ".amb{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;--ambOp:0.09}",
   ".amb i{position:absolute;display:block;line-height:0}",
-  ".amb .p1{top:5%;left:6%;width:112px;height:112px}",
-  ".amb .p2{bottom:7%;right:7%;width:112px;height:112px}",
-  "@media(max-width:520px){.amb .p1{width:92px;height:92px}.amb .p2{width:92px;height:92px}}",
+  /* ancoradas nas margens laterais: 50% menos (metade da coluna + folga + largura) */
+  ".amb .p1{top:9%;left:calc(50% - 350px);width:112px;height:112px}",
+  ".amb .p2{bottom:9%;right:calc(50% - 350px);width:112px;height:112px}",
+  /* Abaixo de 800px nao ha margem livre: as xicaras vao para tras do conteudo,
+     em intensidade bem menor — viram textura, nao desenho, e nao competem com a leitura. */
+  "@media(max-width:800px){.amb{--ambOp:0.04}.amb .p1{top:6%;left:4%;width:96px;height:96px}.amb .p2{bottom:6%;right:4%;width:96px;height:96px}}",
   ".amb svg{width:100%;height:100%;display:block;overflow:visible}",
   ".amb path{fill:none;stroke:" + C.nv + ";stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}",
   ".amb i{opacity:0;animation:ambSurge 14s ease-in-out infinite}",
   ".amb .p2,.amb .p2 path{animation-delay:7s}",
   ".amb i path{animation:ambTraco 14s ease-in-out infinite}",
   "@keyframes ambTraco{0%{stroke-dashoffset:1}30%{stroke-dashoffset:0}62%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}",
-  "@keyframes ambSurge{0%,100%{opacity:0}12%,60%{opacity:0.09}}",
-  "@media (prefers-reduced-motion:reduce){.amb i,.amb i path{animation:none}.amb i{opacity:0.07}.amb path{stroke-dashoffset:0}}"
+  "@keyframes ambSurge{0%,100%{opacity:0}12%,60%{opacity:var(--ambOp,0.09)}}",
+  "@media (prefers-reduced-motion:reduce){.amb i,.amb i path{animation:none}.amb i{opacity:var(--ambOp,0.09)}.amb path{stroke-dashoffset:0}}"
 ].join("\n");
 function Icon(p) {
   var s = p.size || 24;
