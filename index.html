@@ -1573,6 +1573,32 @@ function AdminPanel(p) {
   var vfS = useState(false);
   var verificando = vfS[0];
   var setVerificando = vfS[1];
+  var lembS = useState(false);
+  var lembrar = lembS[0];
+  var setLembrar = lembS[1];
+
+  /* Acesso guardado no aparelho — opcional, escolhido pelo funcionario.
+     Vale 30 dias e pode ser encerrado a qualquer momento pelo botao Sair. */
+  var CHAVE_ADM = "famu_admin_v1";
+  function guardarAcesso(pin) {
+    try {
+      localStorage.setItem(CHAVE_ADM, JSON.stringify({ pin: pin, expira: Date.now() + 30 * 24 * 60 * 60 * 1000 }));
+    } catch (e) {}
+  }
+  function esquecerAcesso() {
+    try { localStorage.removeItem(CHAVE_ADM); } catch (e) {}
+  }
+  useEffect(function () {
+    if (isAuth) return;
+    try {
+      var bruto = localStorage.getItem(CHAVE_ADM);
+      if (!bruto) return;
+      var g = JSON.parse(bruto);
+      if (!g || !g.pin || !g.expira || Date.now() > g.expira) { esquecerAcesso(); return; }
+      ADMIN_PIN_SESSAO = g.pin;
+      setAuth(true);
+    } catch (e) { esquecerAcesso(); }
+  }, []);
   function handleLogin() {
     var digitado = (adminPin || "").trim();
     if (!digitado) return;
@@ -1594,6 +1620,7 @@ function AdminPanel(p) {
       setVerificando(false);
       if (r && r.sucesso) {
         ADMIN_PIN_SESSAO = digitado;
+        if (lembrar) guardarAcesso(digitado);
         setAuth(true);
         setPinErr("");
       } else {
@@ -1610,6 +1637,9 @@ function AdminPanel(p) {
       {
         ref: inputRef,
         type: "password",
+        name: "famu-admin",
+        id: "famu-admin",
+        autoComplete: "current-password",
         placeholder: "\u2022 \u2022 \u2022 \u2022",
         value: adminPin,
         maxLength: 12,
@@ -1623,6 +1653,9 @@ function AdminPanel(p) {
         },
         style: { width: "100%", padding: "15px 16px", borderRadius: 13, border: "2px solid " + (pinErr ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 24, fontWeight: 700, outline: "none", textAlign: "center", letterSpacing: "0.15em", boxSizing: "border-box" }
       }
+    ), React.createElement("label", { style: { display: "flex", alignItems: "center", gap: 9, cursor: "pointer", padding: "2px 2px 4px" } },
+      React.createElement("input", { type: "checkbox", checked: lembrar, onChange: function(e) { setLembrar(e.target.checked); }, style: { width: 17, height: 17, accentColor: C.or, cursor: "pointer" } }),
+      React.createElement("span", { style: { fontSize: 13, color: C.mu, fontFamily: FB } }, "Manter conectado neste aparelho")
     ), React.createElement("button", { onClick: handleLogin, disabled: verificando, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: verificando ? "wait" : "pointer", textTransform: "uppercase", boxShadow: "0 2px 0 " + C.orD, display: "flex", alignItems: "center", justifyContent: "center" } }, verificando ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : "Entrar")), pinErr && React.createElement("div", { style: { marginTop: 12, padding: "10px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, border: "1px solid " + C.orB, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 } }, React.createElement(Icon, { name: "x", size: 15, color: C.or }), " ", pinErr))));
   }
   var items = [
@@ -1646,7 +1679,13 @@ function AdminPanel(p) {
       React.createElement("div", { style: { flex: 1 } }, React.createElement("div", { style: { fontFamily: FD, fontWeight: 700, fontSize: 17, color: C.nv, textTransform: "uppercase", lineHeight: 1 } }, item.t), React.createElement("div", { style: { fontSize: 12, color: C.mu, marginTop: 3 } }, item.d)),
       React.createElement(Icon, { name: "arrow", size: 18, color: C.di })
     );
-  })))));
+  }), React.createElement("div", { style: { marginTop: 18, textAlign: "center" } },
+    React.createElement("button", { onClick: function() {
+      esquecerAcesso();
+      ADMIN_PIN_SESSAO = "";
+      setAuth(false);
+    }, style: { background: "none", border: "none", color: C.di, fontSize: 12.5, fontFamily: FB, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3, padding: 8 } },
+      "Sair e esquecer este aparelho"))))));
 }
 function App() {
   var vS = useState("menu");
