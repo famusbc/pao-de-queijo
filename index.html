@@ -704,7 +704,7 @@ function OperatorView(p) {
       return;
     setLoading(true);
     if (isApiConfigured()) {
-      apiPost({ action: "validarPin", pin: code, adminPin: ADMIN_CODE }).then(function(r) {
+      apiPost({ action: "validarPin", pin: code, adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
         setLoading(false);
         if (!r.sucesso) {
           setFeedback({ t: r.jaRetirou ? "warning" : "error", m: r.erro });
@@ -757,7 +757,7 @@ function OperatorView(p) {
       return;
     if (isApiConfigured()) {
       setRefreshing(true);
-      apiPost({ action: "addFornada", qtd: n, adminPin: ADMIN_CODE }).then(function(r) {
+      apiPost({ action: "addFornada", qtd: n, adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
         if (r.sucesso)
           setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
         setRefreshing(false);
@@ -775,7 +775,7 @@ function OperatorView(p) {
       return;
     if (isApiConfigured()) {
       setRefreshing(true);
-      apiPost({ action: "resetFornada", adminPin: ADMIN_CODE }).then(function(r) {
+      apiPost({ action: "resetFornada", adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
         if (r.sucesso)
           setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
         setRefreshing(false);
@@ -794,7 +794,7 @@ function OperatorView(p) {
       return;
     setAdminLoading(true);
     setAdminResult(null);
-    apiPost({ action: "checkinAdmin", ra: r, adminPin: ADMIN_CODE }).then(function(resp) {
+    apiPost({ action: "checkinAdmin", ra: r, adminPin: ADMIN_PIN_SESSAO }).then(function(resp) {
       setAdminLoading(false);
       if (!resp.sucesso) {
         setAdminResult({ t: "error", m: resp.erro });
@@ -881,7 +881,7 @@ function ConfigView(p) {
     if (novo && !window.confirm("Ativar o MODO RECEP\u00c7\u00c3O?\n\nA tela do aluno passar\u00e1 a gerar SENHAS para candidatos do vestibular (entrega de documenta\u00e7\u00e3o), em vez do p\u00e3o de queijo. Lembre-se de desativar quando o evento terminar.")) return;
     setMrLoading(true);
     if (isApiConfigured()) {
-      apiPost({ action: "salvarModoRecepcao", ativo: novo, adminPin: ADMIN_CODE }).then(function(r) {
+      apiPost({ action: "salvarModoRecepcao", ativo: novo, adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
         setMrLoading(false);
         if (r.sucesso) setModoRec(novo);
         else window.alert("N\u00e3o foi poss\u00edvel alterar: " + (r.erro || "erro"));
@@ -902,7 +902,7 @@ function ConfigView(p) {
         if (nd[k])
           dias.push(mapa[parseInt(k)]);
       });
-      apiPost({ action: "salvarDiasAtivos", dias, adminPin: ADMIN_CODE }).catch(function() {
+      apiPost({ action: "salvarDiasAtivos", dias, adminPin: ADMIN_PIN_SESSAO }).catch(function() {
       });
     }
   }
@@ -927,7 +927,7 @@ function DashView(p) {
   var setDashData = dashS[1];
   useEffect(function() {
     if (isApiConfigured()) {
-      apiGet("dashboard", { adminPin: ADMIN_CODE }).then(function(r) {
+      apiGet("dashboard", { adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
         if (r.sucesso)
           setDashData(r);
       }).catch(function() {
@@ -1003,7 +1003,7 @@ function StatusView(p) {
   useEffect(function() {
     function loadQR() {
       if (isApiConfigured()) {
-        apiGet("qrcodeDia").then(function(r) {
+        apiGet("qrcodeDia", { adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
           if (r.sucesso) {
             setQrDataUrl(gerarQR("https://famusbc.github.io/pao-de-queijo/?k=" + r.chave, 6));
             setQrErro(false);
@@ -1549,7 +1549,10 @@ function RitmoView(p) {
     return React.createElement("div", { key: zi, style: { display: "flex", alignItems: "flex-start", gap: 7, flex: "1 1 150px" } }, React.createElement("span", { style: { flexShrink: 0, width: 9, height: 9, borderRadius: "50%", background: Z.cor, marginTop: 3 } }), React.createElement("div", null, React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: Z.cor, fontFamily: FD, textTransform: "uppercase" } }, Z.nome), React.createElement("div", { style: { fontSize: 11, color: C.mu, lineHeight: 1.35 } }, Z.desc)));
   }))), React.createElement("div", { style: { background: C.wnB, borderRadius: 12, padding: "12px 14px", border: "1px solid " + C.wnD, display: "flex", alignItems: "flex-start", gap: 10 } }, React.createElement(Icon, { name: "timer", size: 18, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }), React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.5 } }, "Esta \xE9 uma previs\xE3o. Os hor\xE1rios se ajustam \xE0 realidade \u2014 use a aba ", React.createElement("b", null, "Ao vivo"), " durante a opera\xE7\xE3o para acompanhar cada forno e registrar as fornadas."))), mode === "vivo" && React.createElement("div", null, React.createElement("div", { style: { background: bannerColor, borderRadius: 16, padding: "16px 18px", marginBottom: 14, display: "flex", alignItems: "center", gap: 13, position: "relative", overflow: "hidden" } }, React.createElement("div", { style: { position: "absolute", right: -12, top: -12, opacity: 0.12 } }, React.createElement(Icon, { name: agora.tipo === "pronto" ? "check" : agora.tipo === "defasagem" ? "flame" : "timer", size: 80, color: C.wh })), React.createElement("div", { style: { width: 42, height: 42, borderRadius: 11, background: "rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 } }, React.createElement(Icon, { name: agora.tipo === "pronto" ? "check" : agora.tipo === "defasagem" ? "flame" : agora.tipo === "inicio" ? "oven" : "timer", size: 24, color: C.wh, stroke: 2.2 })), React.createElement("div", { style: { flex: 1 } }, React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", fontFamily: FB } }, "Agora"), React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: C.wh, fontFamily: FD, lineHeight: 1.15, marginTop: 2 } }, agora.msg))), React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } }, React.createElement(StatTile, { label: "Fornadas hoje", value: totalFornadas, sub: "de ~4 previstas", icon: "oven", accent: true }), React.createElement("div", { style: { flex: 1, background: C.wh, borderRadius: 14, padding: "14px 16px", border: "1px solid " + C.g200 } }, React.createElement("div", { style: { fontSize: 10, color: C.mu, fontFamily: FB, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 } }, "Ciclo sugerido"), React.createElement("div", { style: { fontSize: 13, color: C.tx, fontFamily: FB, lineHeight: 1.4 } }, "Fornada ~", t.assar, " min \xB7 defasar fornos em ", t.defasagem, " min"))), React.createElement("div", { style: { display: "flex", gap: 10, marginBottom: 14, alignItems: "stretch" } }, FornoCard("A"), FornoCard("B")), React.createElement("div", { style: { background: C.wnB, borderRadius: 12, padding: "12px 14px", border: "1px solid " + C.wnD, marginBottom: 14, display: "flex", alignItems: "flex-start", gap: 10 } }, React.createElement(Icon, { name: "flame", size: 18, color: C.wn, style: { flexShrink: 0, marginTop: 1 } }), React.createElement("div", { style: { fontSize: 12, color: C.g700, lineHeight: 1.5 } }, React.createElement("b", null, "Antes de come\xE7ar:"), " pr\xE9-aque\xE7a os dois fornos a 180\xB0C (~10-15 min) com as bandejas de p\xE3es congelados j\xE1 montadas. O guia \xE9 uma sugest\xE3o \u2014 ajuste o ritmo conforme a realidade da copa.")), React.createElement("button", { onClick: resetRitmo, style: { width: "100%", padding: "11px", borderRadius: 11, border: "1px solid " + C.g200, background: C.wh, color: C.mu, fontFamily: FB, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7 } }, React.createElement(Icon, { name: "refresh", size: 15, color: C.mu }), " Reiniciar guia"), React.createElement("div", { style: { textAlign: "center", marginTop: 14, fontSize: 11, color: C.di, lineHeight: 1.5 } }, "Cada \u201CTirar e servir\u201D registra a fornada no estoque automaticamente."))));
 }
-var ADMIN_CODE = "Hn&%G47MlN";
+/* O PIN administrativo NAO fica no codigo publicado. Esta variavel nasce
+   vazia e so e preenchida em memoria depois que o servidor confirma o PIN
+   digitado pelo funcionario. Recarregar a pagina exige novo acesso. */
+var ADMIN_PIN_SESSAO = "";
 function AdminPanel(p) {
   var setView = p.setView;
   var isPickupDay = p.isPickupDay;
@@ -1567,16 +1570,39 @@ function AdminPanel(p) {
     if (inputRef.current && !isAuth)
       inputRef.current.focus();
   }, [isAuth]);
+  var vfS = useState(false);
+  var verificando = vfS[0];
+  var setVerificando = vfS[1];
   function handleLogin() {
-    if (adminPin === ADMIN_CODE) {
+    var digitado = (adminPin || "").trim();
+    if (!digitado) return;
+    function recusar(msg) {
+      setPinErr(msg || "C\xF3digo incorreto");
+      setAdminPin("");
+      ADMIN_PIN_SESSAO = "";
+      if (inputRef.current) inputRef.current.focus();
+    }
+    if (!isApiConfigured()) {
+      /* modo demonstracao: sem servidor para conferir */
+      ADMIN_PIN_SESSAO = digitado;
       setAuth(true);
       setPinErr("");
-    } else {
-      setPinErr("C\xF3digo incorreto");
-      setAdminPin("");
-      if (inputRef.current)
-        inputRef.current.focus();
+      return;
     }
+    setVerificando(true);
+    apiPost({ action: "validarAdmin", adminPin: digitado }).then(function(r) {
+      setVerificando(false);
+      if (r && r.sucesso) {
+        ADMIN_PIN_SESSAO = digitado;
+        setAuth(true);
+        setPinErr("");
+      } else {
+        recusar(r && r.erro ? r.erro : "C\xF3digo incorreto");
+      }
+    }).catch(function() {
+      setVerificando(false);
+      recusar("Sem conex\xE3o. Tente de novo.");
+    });
   }
   if (!isAuth) {
     return React.createElement("div", { className: "grain", style: { minHeight: "100vh", background: C.ow, fontFamily: FB, color: C.tx, display: "flex", flexDirection: "column" } }, React.createElement(TopBar, { onBack, title: "\xC1rea Restrita", bt: "neutral" }), React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 28, position: "relative", zIndex: 2 } }, React.createElement("div", { style: { textAlign: "center", maxWidth: 360, width: "100%", animation: "fadeUp 0.4s ease both" } }, React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 16 } }, React.createElement("div", { style: { width: 64, height: 64, borderRadius: 18, background: C.nv, display: "flex", alignItems: "center", justifyContent: "center" } }, React.createElement(Icon, { name: "lock", size: 32, color: C.wh }))), React.createElement("h2", { style: { fontSize: 24, fontWeight: 800, fontFamily: FD, color: C.nv, textTransform: "uppercase", marginBottom: 6 } }, "Acesso Restrito"), React.createElement("p", { style: { color: C.mu, fontSize: 13, marginBottom: 24, lineHeight: 1.5 } }, "Digite o c\xF3digo de acesso da gest\xE3o."), React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, React.createElement(
@@ -1597,7 +1623,7 @@ function AdminPanel(p) {
         },
         style: { width: "100%", padding: "15px 16px", borderRadius: 13, border: "2px solid " + (pinErr ? C.or : C.g200), background: C.wh, color: C.tx, fontFamily: FM, fontSize: 24, fontWeight: 700, outline: "none", textAlign: "center", letterSpacing: "0.15em", boxSizing: "border-box" }
       }
-    ), React.createElement("button", { onClick: handleLogin, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: "pointer", textTransform: "uppercase", boxShadow: "0 2px 0 " + C.orD } }, "Entrar")), pinErr && React.createElement("div", { style: { marginTop: 12, padding: "10px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, border: "1px solid " + C.orB, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 } }, React.createElement(Icon, { name: "x", size: 15, color: C.or }), " ", pinErr))));
+    ), React.createElement("button", { onClick: handleLogin, disabled: verificando, style: { width: "100%", padding: "15px 24px", borderRadius: 13, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: verificando ? "wait" : "pointer", textTransform: "uppercase", boxShadow: "0 2px 0 " + C.orD, display: "flex", alignItems: "center", justifyContent: "center" } }, verificando ? React.createElement(Spinner, { color: C.wh, track: "rgba(255,255,255,0.3)" }) : "Entrar")), pinErr && React.createElement("div", { style: { marginTop: 12, padding: "10px 14px", borderRadius: 10, background: C.orS, color: C.or, fontSize: 13, fontWeight: 600, border: "1px solid " + C.orB, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 } }, React.createElement(Icon, { name: "x", size: 15, color: C.or }), " ", pinErr))));
   }
   var items = [
     { id: "operator", icon: "key", t: "Painel do Operador", d: isPickupDay ? "Validar c\xF3digo e entregar" : "Registrar presen\xE7a" },
@@ -1692,7 +1718,7 @@ function App() {
     if (isNaN(n) || n <= 0)
       return;
     if (isApiConfigured()) {
-      apiPost({ action: "addFornada", qtd: n, adminPin: ADMIN_CODE }).then(function(r) {
+      apiPost({ action: "addFornada", qtd: n, adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
         if (r.sucesso)
           setBatch({ current: r.estoque, served: r.retiradas, batches: r.fornadaCount, lastBatchTime: r.fornadaHora || "" });
       }).catch(function() {
