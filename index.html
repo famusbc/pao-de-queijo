@@ -678,7 +678,7 @@ function OperatorView(p) {
     if (!isApiConfigured())
       return;
     setRefreshing(true);
-    apiGet("statusDia").then(function(r) {
+    apiGet("statusDia", { adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
       if (r.sucesso)
         aplicarStatus(r);
       setRefreshing(false);
@@ -987,7 +987,7 @@ function StatusView(p) {
   useEffect(function() {
     function poll() {
       if (isApiConfigured()) {
-        apiGet("statusDia").then(function(r) {
+        apiGet("statusDia", { adminPin: ADMIN_PIN_SESSAO }).then(function(r) {
           if (r.sucesso)
             setStatus({ ci: r.checkins, pk: r.retiradas, estoque: r.estoque != null ? r.estoque : 0 });
         }).catch(function() {
