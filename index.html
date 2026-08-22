@@ -367,7 +367,7 @@ function RecepcaoCard(p) {
       ),
       aberto && ce("div", { style: { padding: "4px 16px 16px" } },
         DOCS_RECEPCAO().map(function (doc, i) {
-          return ce("div", { key: i, style: { display: "flex", gap: 11, alignItems: "flex-start", padding: "11px 0", borderBottom: i < 4 ? "1px solid " + C.g100 : "none" } },
+          return ce("div", { key: i, style: { display: "flex", gap: 11, alignItems: "flex-start", padding: "11px 0", borderBottom: i < 5 ? "1px solid " + C.g100 : "none" } },
             ce("span", { style: { flexShrink: 0, width: 22, height: 22, borderRadius: "50%", background: C.nv, color: C.wh, fontSize: 12, fontWeight: 700, fontFamily: FD, display: "flex", alignItems: "center", justifyContent: "center" } }, i + 1),
             ce("div", null,
               ce("div", { style: { fontSize: 13, fontWeight: 700, color: C.tx, fontFamily: FB, lineHeight: 1.3 } }, doc.t),
@@ -600,7 +600,8 @@ function StudentView(p) {
       "O c\xF3digo de retirada \xE9 pessoal e intransfer\xEDvel.",
       "N\xE3o \xE9 poss\xEDvel gerar um novo c\xF3digo no mesmo dia \u2014 guarde o seu com cuidado.",
       "A retirada deve ser feita no hor\xE1rio: " + displayTime + ".",
-      "Benef\xEDcio v\xE1lido apenas para alunos com aula presencial no respectivo dia do seu curso. N\xE3o cumulativo."
+      "Benef\xEDcio v\xE1lido apenas para alunos com aula presencial no respectivo dia do seu curso. N\xE3o cumulativo.",
+      "A identifica\xE7\xE3o no sistema \xE9 pessoal. O uso indevido sujeita o respons\xE1vel \xE0s medidas previstas no regulamento do Programa."
     ].map(function(t, i) {
       return React.createElement("div", { key: i, style: { display: "flex", gap: 11, alignItems: "flex-start", padding: "10px 0", borderBottom: i < 4 ? "1px solid " + C.g100 : "none" } }, React.createElement("span", { style: { flexShrink: 0, width: 22, height: 22, borderRadius: "50%", background: i === 2 ? C.or : C.nv, color: C.wh, fontSize: 12, fontWeight: 700, fontFamily: FD, display: "flex", alignItems: "center", justifyContent: "center" } }, i + 1), React.createElement("span", { style: { fontSize: 13, color: i === 2 ? C.or : C.tx, lineHeight: 1.5, fontWeight: i === 2 ? 600 : 400 } }, t));
     }), React.createElement("p", { style: { fontSize: 11, color: C.di, textAlign: "center", margin: "16px 0" } }, "Seu aceite ser\xE1 registrado com data e hor\xE1rio."), React.createElement("button", { onClick: acceptTerms, style: { width: "100%", padding: 15, borderRadius: 12, border: "none", background: C.or, color: C.wh, fontFamily: FD, fontWeight: 800, fontSize: 16, cursor: "pointer", textTransform: "uppercase", boxShadow: "0 2px 0 " + C.orD } }, "Li e Aceito"), React.createElement("button", { onClick: function() {
