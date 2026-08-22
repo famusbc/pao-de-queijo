@@ -14,12 +14,13 @@
   --fd:'Archivo',sans-serif; --fb:'Barlow',sans-serif; --fm:'IBM Plex Mono',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+html,body{max-width:100%;overflow-x:hidden}
 body{background:var(--sunken);font-family:var(--fb);color:var(--ink);line-height:1.6;
   -webkit-font-smoothing:antialiased}
 .wrap{max-width:620px;margin:0 auto;padding:0 18px 70px}
 
 /* ── capa ── */
-.capa{background:var(--nv);margin:0 -18px 0;padding:38px 24px 34px;text-align:center;position:relative;overflow:hidden}
+.capa{background:var(--nv);margin:0;padding:38px 24px 34px;text-align:center;position:relative;overflow:hidden}
 .capa .mark{width:62px;height:62px;border-radius:15px;background:var(--or);display:inline-flex;flex-direction:column;
   align-items:center;justify-content:center;line-height:1.05;margin-bottom:16px}
 .capa .mark b{font-family:var(--fd);font-size:16px;font-weight:800;color:#fff;letter-spacing:.02em}
@@ -38,6 +39,7 @@ h2::after{content:'';flex:1;height:1px;background:var(--line)}
   display:flex;gap:16px;align-items:flex-start}
 .passo .n{flex-shrink:0;width:34px;height:34px;margin-right:2px;border-radius:9px;background:var(--nv);color:#fff;
   font-family:var(--fd);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.passo > div{min-width:0}
 .passo h3{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--nv);line-height:1.3;margin-bottom:6px;padding-top:4px}
 .passo p{font-size:14px;color:var(--ink2)}
 .passo .tela{margin-top:14px}
