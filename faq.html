@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Como funciona · Pão de Queijo FAMU-SBC</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root{
+  --nv:#16233D; --nv2:#24365C; --or:#E8611A; --orD:#C74F10;
+  --paper:#FFF; --sunken:#F2F4F7; --line:#E1E5EB; --line2:#CBD2DB;
+  --ink:#141922; --ink2:#4A5563; --ink3:#8A93A0;
+  --ok:#12704A; --warn:#8A6410;
+  --fd:'Archivo',sans-serif; --fb:'Barlow',sans-serif; --fm:'IBM Plex Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--sunken);font-family:var(--fb);color:var(--ink);line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:620px;margin:0 auto;padding:0 18px 70px}
+
+/* ── capa ── */
+.capa{background:var(--nv);margin:0 -18px 0;padding:38px 24px 34px;text-align:center;position:relative;overflow:hidden}
+.capa .mark{width:62px;height:62px;border-radius:15px;background:var(--or);display:inline-flex;flex-direction:column;
+  align-items:center;justify-content:center;line-height:1.05;margin-bottom:16px}
+.capa .mark b{font-family:var(--fd);font-size:16px;font-weight:800;color:#fff;letter-spacing:.02em}
+.capa .mark i{font-family:var(--fd);font-size:10px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:.18em;font-style:normal}
+.capa h1{font-family:var(--fd);font-size:25px;font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.008em}
+.capa p{font-size:14px;color:rgba(255,255,255,.72);margin-top:9px;max-width:400px;margin-left:auto;margin-right:auto}
+
+/* ── seções ── */
+section{margin-top:32px}
+h2{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--or);text-transform:uppercase;
+  letter-spacing:.14em;margin-bottom:14px;display:flex;align-items:center;gap:9px}
+h2::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ── passos ── */
+.passo{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:12px;
+  display:flex;gap:16px;align-items:flex-start}
+.passo .n{flex-shrink:0;width:34px;height:34px;margin-right:2px;border-radius:9px;background:var(--nv);color:#fff;
+  font-family:var(--fd);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.passo h3{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--nv);line-height:1.3;margin-bottom:6px;padding-top:4px}
+.passo p{font-size:14px;color:var(--ink2)}
+.passo .tela{margin-top:14px}
+
+/* ── telas ilustrativas ── */
+.tela{background:var(--sunken);border:1px solid var(--line);border-radius:10px;padding:14px}
+.tela .campo{background:#fff;border:1px solid var(--line2);border-radius:7px;padding:11px;text-align:center;
+  font-family:var(--fm);font-size:16px;color:var(--nv);letter-spacing:.05em}
+.tela .campo.vazio{color:#B6BDC7}
+.tela .btn{background:var(--or);color:#fff;border-radius:7px;padding:11px;text-align:center;margin-top:8px;
+  font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.tela .rot{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:7px}
+
+/* ── comprovante ── */
+.comp{border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#fff}
+.comp .h{background:var(--nv);padding:15px 16px 13px}
+.comp .h .eb{font-size:9px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.comp .h .nome{font-family:var(--fd);font-size:17px;font-weight:500;color:#fff;margin-top:6px;line-height:1.2}
+.comp .h .meta{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.6);margin-top:6px}
+.comp .serr{height:12px;background:var(--nv);position:relative}
+.comp .serr::before,.comp .serr::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--sunken);top:-2px}
+.comp .serr::before{left:-8px}.comp .serr::after{right:-8px}
+.comp .b{padding:16px;text-align:center}
+.comp .b .eb{font-size:9px;font-weight:700;letter-spacing:.17em;text-transform:uppercase;color:var(--ink3)}
+.digitos{display:flex;gap:7px;justify-content:center;margin-top:10px}
+.digitos b{width:42px;height:52px;border:1px solid var(--line);border-radius:6px;background:var(--sunken);
+  display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:25px;font-weight:500;color:var(--nv)}
+
+/* ── QR ilustrativo ── */
+.qr{width:110px;height:110px;background:#fff;border:1px solid var(--line2);border-radius:8px;padding:9px;margin:0 auto}
+.qr svg{width:100%;height:100%;display:block}
+
+/* ── regra em destaque ── */
+.regra{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--or);
+  border-radius:0 10px 10px 0;padding:16px 18px;margin-bottom:11px}
+.regra h4{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--nv);margin-bottom:5px;line-height:1.3}
+.regra p{font-size:13.5px;color:var(--ink2)}
+.regra.atencao{border-left-color:var(--warn);background:rgba(138,100,16,.045)}
+.regra.atencao h4{color:var(--warn)}
+
+/* ── perguntas ── */
+.faq{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.faq summary{padding:15px 18px;cursor:pointer;font-family:var(--fd);font-size:15px;font-weight:600;color:var(--nv);
+  list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;line-height:1.3}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';font-family:var(--fm);font-size:19px;color:var(--or);flex-shrink:0;font-weight:500}
+.faq[open] summary::after{content:'–'}
+.faq[open] summary{border-bottom:1px solid var(--line)}
+.faq .resp{padding:15px 18px;font-size:14px;color:var(--ink2)}
+.faq .resp strong{color:var(--ink)}
+
+/* ── erros ── */
+.erro{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid var(--line)}
+.erro:last-child{border-bottom:none}
+.erro .ic{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:rgba(232,97,26,.09);
+  display:flex;align-items:center;justify-content:center}
+.erro .msg{font-family:var(--fm);font-size:12px;color:var(--or);margin-bottom:3px}
+.erro .sol{font-size:13.5px;color:var(--ink2)}
+
+.rodape{margin-top:38px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
+.rodape p{font-size:12.5px;color:var(--ink3)}
+.rodape b{color:var(--ink2)}
+
+@media print{
+  body{background:#fff}
+  .faq{border:1px solid #ccc}
+  .faq .resp{display:block !important}
+  .faq summary::after{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="capa">
+  <div class="mark"><b>FAMU</b><i>SBC</i></div>
+  <h1>Como retirar seu pão de queijo</h1>
+  <p>Guia rápido do aplicativo do Programa Faculdade Municipal São Bernardo do Campo</p>
+</div>
+
+<div class="wrap">
+
+  <section>
+    <h2>O passo a passo</h2>
+
+    <div class="passo">
+      <div class="n">1</div>
+      <div style="flex:1">
+        <h3>Aponte a câmera para o QR Code</h3>
+        <p>O QR Code fica exposto na entrada da faculdade. Abra a câmera do celular, aponte e toque no link que aparecer.</p>
+        <div class="tela" style="margin-top:14px">
+          <div class="qr">
+            <svg viewBox="0 0 21 21" shape-rendering="crispEdges">
+              <rect width="21" height="21" fill="#fff"/>
+              <g fill="#16233D">
+                <rect x="0" y="0" width="7" height="1"/><rect x="0" y="6" width="7" height="1"/>
+                <rect x="0" y="0" width="1" height="7"/><rect x="6" y="0" width="1" height="7"/>
+                <rect x="2" y="2" width="3" height="3"/>
+                <rect x="14" y="0" width="7" height="1"/><rect x="14" y="6" width="7" height="1"/>
+                <rect x="14" y="0" width="1" height="7"/><rect x="20" y="0" width="1" height="7"/>
+                <rect x="16" y="2" width="3" height="3"/>
+                <rect x="0" y="14" width="7" height="1"/><rect x="0" y="20" width="7" height="1"/>
+                <rect x="0" y="14" width="1" height="7"/><rect x="6" y="14" width="1" height="7"/>
+                <rect x="2" y="16" width="3" height="3"/>
+                <rect x="9" y="1" width="1" height="1"/><rect x="11" y="2" width="1" height="1"/>
+                <rect x="9" y="4" width="1" height="1"/><rect x="12" y="5" width="1" height="1"/>
+                <rect x="8" y="8" width="1" height="1"/><rect x="10" y="9" width="1" height="1"/>
+                <rect x="12" y="8" width="1" height="1"/><rect x="14" y="9" width="1" height="1"/>
+                <rect x="16" y="8" width="1" height="1"/><rect x="18" y="10" width="1" height="1"/>
+                <rect x="9" y="11" width="1" height="1"/><rect x="11" y="12" width="1" height="1"/>
+                <rect x="13" y="11" width="1" height="1"/><rect x="15" y="13" width="1" height="1"/>
+                <rect x="17" y="12" width="1" height="1"/><rect x="19" y="14" width="1" height="1"/>
+                <rect x="9" y="15" width="1" height="1"/><rect x="11" y="16" width="1" height="1"/>
+                <rect x="13" y="17" width="1" height="1"/><rect x="15" y="16" width="1" height="1"/>
+                <rect x="17" y="18" width="1" height="1"/><rect x="19" y="19" width="1" height="1"/>
+                <rect x="9" y="19" width="1" height="1"/><rect x="12" y="19" width="1" height="1"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="passo">
+      <div class="n">2</div>
+      <div style="flex:1">
+        <h3>Informe seu RA ou CPF</h3>
+        <p>Digite só os números, sem pontos ou traços. Se você ainda não sabe seu RA, pode usar o CPF.</p>
+        <div class="tela">
+          <div class="rot">Código de retirada</div>
+          <div class="campo vazio">RA ou CPF</div>
+          <div class="btn">Acessar</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="passo">
+      <div class="n">3</div>
+      <div style="flex:1">
+        <h3>Guarde o código de 4 dígitos</h3>
+        <p>Ele aparece com o seu nome. É esse número que você vai apresentar na copa.</p>
+        <div class="tela">
+          <div class="comp">
+            <div class="h">
+              <div class="eb">Bem-vindo(a)</div>
+              <div class="nome">Seu nome aparece aqui</div>
+              <div class="meta">Seu curso · 18:32</div>
+            </div>
+            <div class="serr"></div>
+            <div class="b">
+              <div class="eb">Código de retirada</div>
+              <div class="digitos"><b>6</b><b>2</b><b>7</b><b>7</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="passo">
+      <div class="n">4</div>
+      <div style="flex:1">
+        <h3>Apresente o código na copa</h3>
+        <p>Mostre a tela ou diga o número para quem está atendendo. Pronto — é só retirar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>O que você precisa saber</h2>
+
+    <div class="regra atencao">
+      <h4>O QR Code muda todos os dias</h4>
+      <p>Cada dia tem o seu. O de ontem não funciona hoje, e nenhum link salvo nos favoritos vai funcionar no dia seguinte. Sempre escaneie o QR Code que está exposto na entrada naquele dia.</p>
+    </div>
+
+    <div class="regra atencao">
+      <h4>O código de ontem não vale hoje</h4>
+      <p>Todo dia é um código novo. Anotar o número de um dia para usar no outro não funciona — o sistema não reconhece.</p>
+    </div>
+
+    <div class="regra">
+      <h4>Uma unidade por dia</h4>
+      <p>Cada aluno tem direito a um pão de queijo por dia de oferta. O benefício não acumula de um dia para o outro.</p>
+    </div>
+
+    <div class="regra">
+      <h4>Seu código é só seu</h4>
+      <p>Ele é pessoal e intransferível. A identificação no sistema deve ser sempre a sua.</p>
+    </div>
+
+    <div class="regra">
+      <h4>Não dá para gerar outro no mesmo dia</h4>
+      <p>Se você pedir de novo, o sistema mostra o mesmo número. Por isso, guarde o seu com atenção até a hora de retirar.</p>
+    </div>
+
+    <div class="regra">
+      <h4>Fechou o app? Abra de novo</h4>
+      <p>O código fica guardado no seu celular durante o dia. Se você fechar sem querer, é só abrir novamente que ele aparece na hora, sem precisar digitar nada.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Se aparecer alguma mensagem</h2>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px 18px">
+
+      <div class="erro">
+        <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8611A" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
+        <div>
+          <div class="msg">Acesse pelo QR Code da entrada</div>
+          <div class="sol">Você abriu o app por um link antigo ou pelos favoritos. Escaneie o QR Code exposto hoje na entrada.</div>
+        </div>
+      </div>
+
+      <div class="erro">
+        <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8611A" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
+        <div>
+          <div class="msg">Não encontramos esse número</div>
+          <div class="sol">Confira se digitou certo, só números, sem pontos ou traços. Tente o CPF se estava usando o RA. Se continuar, procure a secretaria — seu cadastro pode estar pendente.</div>
+        </div>
+      </div>
+
+      <div class="erro">
+        <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8611A" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div>
+          <div class="msg">Fora do horário</div>
+          <div class="sol">A geração do código funciona apenas durante o horário de distribuição, que aparece na tela do app.</div>
+        </div>
+      </div>
+
+      <div class="erro">
+        <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8611A" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
+        <div>
+          <div class="msg">Sem conexão</div>
+          <div class="sol">Verifique sua internet e toque em tentar de novo. Se você já gerou seu código hoje, ele continua valendo e aparece mesmo sem conexão.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Perguntas frequentes</h2>
+
+    <details class="faq">
+      <summary>Preciso escanear o QR Code todos os dias?</summary>
+      <div class="resp">Sim. <strong>Todo dia tem um QR Code diferente.</strong> Guardar o link nos favoritos não adianta: no dia seguinte ele deixa de funcionar e você vai precisar escanear o novo, exposto na entrada.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Por que preciso estar na faculdade para gerar o código?</summary>
+      <div class="resp">Porque o QR Code fica exposto no local. É assim que o programa garante que a retirada seja feita por quem está presente naquele dia.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Perdi meu código. Consigo outro?</summary>
+      <div class="resp">O sistema mostra <strong>sempre o mesmo número</strong> para você naquele dia. Basta abrir o app novamente — o código fica guardado no seu celular. Se não aparecer, escaneie o QR Code de novo e informe seu RA ou CPF.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Posso pegar para um colega que não veio?</summary>
+      <div class="resp">Não. O código é <strong>pessoal e intransferível</strong>, e cada aluno tem direito a uma unidade por dia. A identificação no sistema deve ser sempre a sua.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Não sei meu RA. E agora?</summary>
+      <div class="resp">Use o <strong>CPF</strong>, só os números. Funciona da mesma forma.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Uso nome social. Vai aparecer qual nome?</summary>
+      <div class="resp">O <strong>seu nome social</strong>. Sempre que ele estiver cadastrado, é ele que aparece na tela, no comprovante e para quem atende na copa.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Meu celular está sem internet. O que faço?</summary>
+      <div class="resp">Se você <strong>já gerou o código hoje</strong>, ele aparece mesmo sem conexão — é só abrir o app. Se ainda não gerou, use a rede da faculdade ou peça orientação na copa.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Todo dia tem pão de queijo?</summary>
+      <div class="resp">A distribuição acontece nos dias definidos pelo programa. O app informa quando é dia de oferta e qual o horário.</div>
+    </details>
+
+    <details class="faq">
+      <summary>Preciso instalar algum aplicativo?</summary>
+      <div class="resp">Não. Tudo funciona pelo navegador do celular, direto do QR Code. Não há nada para baixar.</div>
+    </details>
+
+  </section>
+
+  <div class="rodape">
+    <p><b>Programa Faculdade Municipal São Bernardo do Campo</b><br>
+    Em caso de dúvida, procure a administração do Programa.</p>
+  </div>
+
+</div>
+</body>
+</html>
