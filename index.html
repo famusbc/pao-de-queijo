@@ -1718,10 +1718,12 @@ function App() {
   var setAvisosAtivos = avAtS[1];
   var modoRecepcao = mrS[0];
   var setModoRecepcao = mrS[1];
-  useEffect(function() {
-    if (!isApiConfigured())
-      return;
-    apiGet("diasAtivos").then(function(r) {
+  /* Estas consultas exigem a chave do QR do dia ou a senha administrativa.
+     O aluno chega pelo QR e ja tem a chave; a equipe passa a senha depois de
+     entrar. Por isso a carga se repete quando o acesso administrativo e feito. */
+  function carregarConfig(cred) {
+    if (!isApiConfigured()) return;
+    apiGet("diasAtivos", cred).then(function(r) {
       if (r.sucesso) {
         var mapa = { DOM: 0, SEG: 1, TER: 2, QUA: 3, QUI: 4, SEX: 5, SAB: 6 };
         var obj = {};
@@ -1736,12 +1738,20 @@ function App() {
       }
     }).catch(function() {
     });
-    apiGet("avisos").then(function(r) {
+    apiGet("avisos", cred).then(function(r) {
       if (r.sucesso && r.avisos.length > 0)
         setAvisos(r.avisos);
     }).catch(function() {
     });
+  }
+  /* aluno: entra pelo QR, ja tem a chave do dia */
+  useEffect(function() {
+    carregarConfig(dailyKey ? { k: dailyKey } : undefined);
   }, []);
+  /* equipe: nao entra pelo QR — recarrega assim que o acesso e confirmado */
+  useEffect(function() {
+    if (adminAuth && ADMIN_PIN_SESSAO) carregarConfig({ adminPin: ADMIN_PIN_SESSAO });
+  }, [adminAuth]);
   var isPickupDay = activeDays[getDow()] || false;
   var liveDistro = isPickupDay && dentroDoHorario(pickupTime);
   var sharedProps = { terms, setTerms, batch, setBatch, activeDays, setActiveDays, pickupActive: isPickupDay, pickupTime, avisos, dailyKey, modoRecepcao, avisosAtivos, onBack: function() {
