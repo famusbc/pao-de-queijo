@@ -124,7 +124,12 @@ var DEMO_AVISOS = [
   { titulo: "Documenta\xE7\xE3o pendente", texto: "Regularize at\xE9 30/05 na secretaria.", dataFim: "" }
 ];
 function getToday() {
-  return (new Date()).toISOString().split("T")[0];
+  /* Data LOCAL do aparelho, nao universal.
+     toISOString() converte para o fuso universal, que no Brasil vira o dia
+     seguinte a partir das 21h — o codigo guardado seria descartado como
+     "de ontem" no meio da distribuicao. */
+  var d = new Date();
+  return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
 }
 function getNow() {
   return (new Date()).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
