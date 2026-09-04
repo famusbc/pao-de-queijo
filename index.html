@@ -1732,28 +1732,56 @@ function App() {
   /* Estas consultas exigem a chave do QR do dia ou a senha administrativa.
      O aluno chega pelo QR e ja tem a chave; a equipe passa a senha depois de
      entrar. Por isso a carga se repete quando o acesso administrativo e feito. */
-  function carregarConfig(cred) {
+  /* A configuracao do dia fica guardada no aparelho por 5 minutos.
+
+     Antes, TODO aluno que abria o app disparava duas chamadas ao servidor
+     antes mesmo de digitar: uma para a configuracao e outra para os avisos.
+     Com 275 alunos, eram 550 idas ao servidor so de abertura.
+
+     Agora: quem reabre dentro de 5 minutos nao consulta nada, e a busca de
+     avisos so acontece se eles estiverem ligados. */
+  var CFG_CACHE = "famu_cfg_v1";
+
+  function aplicarConfig(r) {
+    var mapa = { DOM: 0, SEG: 1, TER: 2, QUA: 3, QUI: 4, SEX: 5, SAB: 6 };
+    var obj = {};
+    (r.dias || []).forEach(function(d) { obj[mapa[d]] = true; });
+    setActiveDays(obj);
+    if (r.horario) setPickupTime(r.horario);
+    setModoRecepcao(!!r.modoRecepcao);
+    setAvisosAtivos(!!r.avisosAtivos);
+  }
+
+  function carregarConfig(cred, forcar) {
     if (!isApiConfigured()) return;
+    if (!forcar) {
+      try {
+        var g = JSON.parse(localStorage.getItem(CFG_CACHE) || "null");
+        if (g && g.exp > Date.now() && g.r) {
+          aplicarConfig(g.r);
+          if (g.avisos && g.avisos.length) setAvisos(g.avisos);
+          return;
+        }
+      } catch (e) {}
+    }
     apiGet("diasAtivos", cred).then(function(r) {
-      if (r.sucesso) {
-        var mapa = { DOM: 0, SEG: 1, TER: 2, QUA: 3, QUI: 4, SEX: 5, SAB: 6 };
-        var obj = {};
-        r.dias.forEach(function(d) {
-          obj[mapa[d]] = true;
-        });
-        setActiveDays(obj);
-        if (r.horario)
-          setPickupTime(r.horario);
-        setModoRecepcao(!!r.modoRecepcao);
-        setAvisosAtivos(!!r.avisosAtivos);
+      if (!r.sucesso) return;
+      aplicarConfig(r);
+      var guardar = { exp: Date.now() + 5 * 60 * 1000, r: r, avisos: null };
+      /* os avisos so sao buscados quando estao ligados — evita uma ida ao
+         servidor por aluno para receber uma lista vazia */
+      if (r.avisosAtivos) {
+        apiGet("avisos", cred).then(function(a) {
+          if (a.sucesso && a.avisos && a.avisos.length > 0) {
+            setAvisos(a.avisos);
+            guardar.avisos = a.avisos;
+          }
+          try { localStorage.setItem(CFG_CACHE, JSON.stringify(guardar)); } catch (e) {}
+        }).catch(function() {});
+      } else {
+        try { localStorage.setItem(CFG_CACHE, JSON.stringify(guardar)); } catch (e) {}
       }
-    }).catch(function() {
-    });
-    apiGet("avisos", cred).then(function(r) {
-      if (r.sucesso && r.avisos.length > 0)
-        setAvisos(r.avisos);
-    }).catch(function() {
-    });
+    }).catch(function() {});
   }
   /* aluno: entra pelo QR, ja tem a chave do dia */
   useEffect(function() {
@@ -1761,7 +1789,7 @@ function App() {
   }, []);
   /* equipe: nao entra pelo QR — recarrega assim que o acesso e confirmado */
   useEffect(function() {
-    if (adminAuth && ADMIN_PIN_SESSAO) carregarConfig({ adminPin: ADMIN_PIN_SESSAO });
+    if (adminAuth && ADMIN_PIN_SESSAO) carregarConfig({ adminPin: ADMIN_PIN_SESSAO }, true);
   }, [adminAuth]);
   var isPickupDay = activeDays[getDow()] || false;
   var liveDistro = isPickupDay && dentroDoHorario(pickupTime);
